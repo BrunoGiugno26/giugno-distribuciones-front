@@ -8,17 +8,58 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-
-// Definición de las líneas de producto (datos estáticos)
-
 
 const MenuList = () => {
     return (
         <NavigationMenu>
-      <NavigationMenuList className="flex-wrap">
-        <NavigationMenuItem>
+      <NavigationMenuList className="flex-nowrap gap-x-4">
+        <NavigationMenuItem className="shrink-0">
+          <NavigationMenuTrigger>Cuidado Capilar</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid gap-2 sm:w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px] p-4">
+              {components.map((component) => (
+                <ListItem
+                  key={component.title}
+                  title={component.title}
+                  href={component.href}
+                >
+                  {component.description}
+                </ListItem>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem className="shrink-0">
+          <NavigationMenuTrigger>Para Salones</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[400px] gap-2 p-4 md:w-[500px] md:grid-cols-2">
+              {salon.slice(0, 2).map((item) => (
+                <ListItem
+                  key={item.title}
+                  title={item.title}
+                  href={item.href}
+                  className="col-span-1"
+                >
+                  {item.description}
+                </ListItem>
+              ))}
+              {salon.slice(2, 3).map((item) => (
+                <ListItem
+                  key={item.title}
+                  title={item.title}
+                  href={item.href}
+                  className="col-span-2"
+                >
+                  {item.description}
+                </ListItem>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        
+        <NavigationMenuItem className="shrink-0">
           <NavigationMenuTrigger>Nosotros</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -46,30 +87,10 @@ const MenuList = () => {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Cuidado Capilar</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid gap-2 sm:w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {components.map((component) => (
-                <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
-                >
-                  {component.description}
-                </ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/docs">Para Salones</Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
+
       </NavigationMenuList>
     </NavigationMenu>
-  )
+    )
 }
 export default MenuList
 
@@ -128,6 +149,25 @@ const components: { title: string; href: string; description: string }[] = [
       "Agentes químicos que se mezclan con las tinturas o decolorantes para activar la acción del color.",
   },
 ];
+
+const salon: {title: string; href:string; description: string}[] = [
+  {
+    title: "Cuidado y Reventa",
+    href: "salones/reventa",
+    description:"Shampooos, acondicionadores, baños de crema y productos de reventa para el salón"
+  },
+  {
+    title: "Accesorios Profesionales",
+    href: "salones/accesorios-pro",
+    description:"Tijeras, secadores, capas y herramientas especializadas para el trabajo en salón."
+  },
+  {
+    title: "Ventas Mayoristas",
+    href: "salones/mayoristas",
+    description:"Obténe precios exclusivos y volúmenes especiales para tu negocio. Contactactanos."
+  },
+];
+
 function ListItem({
   title,
   children,
