@@ -24,7 +24,7 @@ const router = useRouter()
           {Array.isArray(result) &&
             result.map((product: ProductType) => {
               const { attributes, id } = product;
-              const { slug, images, productName, tipoProducto, origin } =
+              const { slug, images, productName, tipoProducto, origin,} =
                 attributes;
 
               return (

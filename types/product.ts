@@ -7,6 +7,7 @@ export type ProductType = {
         active:boolean;
         isFeatured:boolean;
         tipoProducto:string;
+        tipoCabello:string;
         origin:string;
         price:number;
         images:{
