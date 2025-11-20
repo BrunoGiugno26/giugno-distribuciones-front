@@ -17,14 +17,14 @@ const router = useRouter()
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
-      <h3 className="px-6 text-3xl sm:pb-8 font-serif">Productos destacados</h3>
+      <h3 className="text-center font-semibold px-6 text-3xl sm:mt-1 pb-8 underline">Productos destacados</h3>
       <Carousel>
         <CarouselContent className="-ml-2 md:-ml-4">
           {loading && <SkeletonSchema grid={3} />}
           {Array.isArray(result) &&
             result.map((product: ProductType) => {
               const { attributes, id } = product;
-              const { slug, images, productName, tipoProducto, origin,} =
+              const { slug, images, productName, tipoProducto, tipoCabello,} =
                 attributes;
 
               return (
@@ -71,12 +71,12 @@ const router = useRouter()
                                 {productName}
                             </h4>
 
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex flex-col items-center gap-2 shrink-0">
                                 <p className="text-xs rounded-full px-3 py-1 bg-black text-white border border-black dark:bg-white dark:text-black dark:border-white">
                                     {tipoProducto}
                                 </p>
                                 <p className="text-xs rounded-full px-3 py-1 bg-yellow-900 text-white border border-black dark:bg-sky-800 dark:text-white dark:border-white">
-                                    {origin}
+                                    {tipoCabello}
                                 </p>
                             </div>
                         </div>
