@@ -37,10 +37,10 @@ const CarouselImageBanner = () => {
   return (
     <div className="w-full bg-white dark:bg-gray-900">
       <Carousel
-        className="w-full max-w-7xl mx-auto p-4" // Añadimos padding y ancho máximo
+        className="w-full max-w-7xl mx-auto p-4" 
         plugins={[
           Autoplay({
-            delay: 4000, // Tiempo de visualización de cada banner
+            delay: 4000,
             stopOnInteraction: false,
           }),
         ]}
