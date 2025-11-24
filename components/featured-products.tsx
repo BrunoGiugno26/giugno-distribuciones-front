@@ -24,66 +24,61 @@ const router = useRouter()
           {Array.isArray(result) &&
             result.map((product: ProductType) => {
               const { attributes, id } = product;
-              const { slug, images, productName, tipoProducto, tipoCabello,} =
-                attributes;
+              const { slug, images, productName, tipoProducto, tipoCabello } =
+          attributes;
 
               return (
-                <CarouselItem
-                  key={id}
-                  className="md:basis-1/2 lg:basis-1/3 group"
-                >
-                  <div className="p-1">
-                    <Card
-                      className="
-                        border border-gray-200 dark:border-gray-700 
-                        bg-white dark:bg-gray-800 shadow-none h-80 
-                        flex flex-col overflow-hidden rounded-lg 
-                        transition-all duration-300 hover:shadow-xl hover:scale-[1.01] cursor-pointer
-                    "
-                    >
-                      <div className="relative h-[260px] w-full overflow-hidden flex items-center justify-center">
-                        <img
-                          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${
-                            images?.data?.[0]?.attributes?.url ?? ""
-                          }`}
-                          alt={productName ?? "Imagen Destacada"}
-                          className="w-full h-full object-cover"
-                        />
+          <CarouselItem
+            key={id}
+            className="md:basis-1/2 lg:basis-1/3 group"
+          >
+            <div className="p-1">
+              <Card
+                className="
+            border border-gray-200 dark:border-gray-700 
+            bg-white dark:bg-gray-800 shadow-none h-full 
+            flex flex-col overflow-hidden rounded-lg 
+            transition-all duration-300 hover:shadow-xl hover:scale-[1.01] cursor-pointer
+              "
+              >
+                <div className="relative w-full aspect-square overflow-hidden flex items-center justify-center shrink-0">
+            <img
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${
+                images?.data?.[0]?.attributes?.url ?? ""
+              }`}
+              alt={productName ?? "Imagen Destacada"}
+              className="w-full h-full object-cover"
+            />
 
-                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center space-x-4 opacity-0 transition-opacity duration-300 group-hover:opacity-60">
-                            <IconButton
-                            onClick={() => router.push(`product/${slug}`)}
-                            icon={<Expand size={20} 
-                            className=" bg-white text-black"
-                            />} />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center space-x-4 opacity-0 transition-opacity duration-300 group-hover:opacity-40">
+              <IconButton
+                onClick={() => router.push(`product/${slug}`)}
+                icon={<Expand size={20} className="bg-white text-black" />}
+              />
+              <IconButton
+                onClick={() => console.log("Add item")}
+                icon={<ShoppingCart size={20} className="bg-white text-black" />}
+              />
+            </div>
+                </div>
 
-                            <IconButton
-                            onClick={() => console.log("Add item")}
-                            icon={<ShoppingCart size={20} 
-                            className="bg-white text-black"
-                            />} />
-                        </div>
-                      </div>
-
-                    <div className="px-6 pt-3 pb-4 h-auto flex-1">
-                        <div className="flex items-start justify-between">
-                            <h4 className=" text-center text-sm md:text-base lg:text-lg font-medium text-gray-900 dark:text-gray-100 whitespace-normal flex-1 mr-6">
-                                {productName}
-                            </h4>
-
-                            <div className="flex flex-col items-center gap-2 shrink-0">
-                                <p className="text-xs rounded-full px-3 py-1 bg-black text-white border border-black dark:bg-white dark:text-black dark:border-white">
-                                    {tipoProducto}
-                                </p>
-                                <p className="text-xs rounded-full px-3 py-1 bg-yellow-900 text-white border border-black dark:bg-sky-800 dark:text-white dark:border-white">
-                                    {tipoCabello}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    </Card>
-                  </div>
-                </CarouselItem>
+                <div className="px-4 py-4 flex flex-col gap-3 flex-1 justify-between">
+            <h4 className="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100 line-clamp-2">
+              {productName}
+            </h4>
+            
+            <div className="flex flex-wrap gap-2">
+              <p className="text-xs rounded-full px-3 py-1 bg-black text-white border border-black dark:bg-white dark:text-black">
+                {tipoProducto}
+              </p>
+              <p className="text-xs rounded-full px-3 py-1 bg-yellow-900 text-white border border-yellow-900 dark:bg-sky-800 dark:border-sky-800">
+                {tipoCabello}
+              </p>
+            </div>
+                </div>
+              </Card>
+            </div>
+          </CarouselItem>
               );
             })}
         </CarouselContent>
