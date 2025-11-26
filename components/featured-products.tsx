@@ -16,8 +16,13 @@ const router = useRouter()
   console.log(result);
 
   return (
-    <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
-      <h3 className="text-center font-semibold px-6 text-3xl sm:mt-1 pb-8 underline">Productos destacados</h3>
+    <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">
+      <h3 className="text-xl sm:text-3xl font-bold text-center px-6 
+      uppercase tracking-wider text-slate-900 dark:text-white sm:mt-1 pb-8 ">Productos{" "}
+      <span className="text-amber-500 dark:text-sky-500 ml-1">
+        destacados
+      </span>
+       </h3>
       <Carousel>
         <CarouselContent className="-ml-2 md:-ml-4">
           {loading && <SkeletonSchema grid={3} />}

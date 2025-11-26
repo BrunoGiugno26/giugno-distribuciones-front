@@ -148,6 +148,18 @@ const components: { title: string; href: string; description: string }[] = [
     description:
       "Agentes químicos que se mezclan con las tinturas o decolorantes para activar la acción del color.",
   },
+  {
+    title: "Reparador de Puntas",
+    href: "/productos/rep-puntas",
+    description:
+      "Agentes químicos que se mezclan con las tinturas o decolorantes para activar la acción del color.",
+  },
+  {
+    title: "Finalizadores",
+    href: "/productos/finalizadores",
+    description:
+      "Agentes químicos que se mezclan con las tinturas o decolorantes para activar la acción del color.",
+  },
 ];
 
 const salon: {title: string; href:string; description: string}[] = [
