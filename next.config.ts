@@ -1,16 +1,33 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración para el componente Image de Next.js
   images: {
-    // La lista de dominios/hostnames de donde Next.js puede cargar imágenes.
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '1337', // Puerto por defecto de Strapi
-        pathname: '/uploads/**', // Permite cualquier ruta dentro de /uploads/
+        port: '1337', 
+        pathname: '/uploads/**', 
       },
-      // Si usas un servidor Strapi en producción, agrégalo aquí también:
+      {
+        protocol:"https",
+        hostname:"img.clerk.com",
+      },
+      {
+        protocol:"https",
+        hostname:"images-clerk.dev",
+      },
+      {
+        protocol:"https",
+        hostname:"img-clerk.com",
+      },
+      {
+        protocol:"https",
+        hostname:"lh3.googleusercontent.com",
+      },
+      {
+        protocol:"https",
+        hostname:"avatars.githubusercontent.com",
+      },
       /*
       {
         protocol: 'https',

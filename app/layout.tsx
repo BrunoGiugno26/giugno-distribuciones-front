@@ -1,3 +1,8 @@
+// ./app/layout.tsx
+import { ClerkProvider } from "@clerk/nextjs";
+import SyncWrapper from "@/components/syncWrapper";
+import { esES } from "@clerk/localizations";
+
 import type { Metadata } from "next";
 import { Ubuntu, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -28,21 +33,62 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${ubuntu.variable} ${geistMono.variable} antialiased`}
-      suppressHydrationWarning
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+    <ClerkProvider
+      localization={esES}
+      appearance={{
+        variables: {
+          colorPrimary: "#1A1A1A",
+          colorText: "#1A1A1A",
+          colorBackground: "#FFFFFF",
+          colorInputBackground: "FAFAFA",
+          colorShimmer: "#E0E0E0",
+        },
+        elements: {
+          card: {
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            borderRadius: "10px",
+            border: "1px solid #E0E0E0",
+          },
+          // Personalización del botón principal ("Continuar", "Registrarse")
+          formButtonPrimary: {
+            // Eliminar mayúsculas forzadas
+            textTransform: "none",
+            // Color de fondo profesional (negro o el color de tu marca)
+            backgroundColor: "#1A1A1A",
+            "&:hover": {
+              backgroundColor: "#333333",
+            },
+            transition: "background-color 0.3s ease",
+          },
+
+          formFieldInput: {
+            border: "1px solid #E0E0E0",
+            transition: "border-color 0.3s ease",
+            "&:hover": {
+              borderColor: "#A0A0A0",
+            },
+          },
+        },
+      }}
+    >
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${ubuntu.variable} ${geistMono.variable} antialiased`}
+          suppressHydrationWarning
         >
-          <Navbar />
-          {children}
-          <Footer />
-        </ThemeProvider>
-      </body>
-    </html>
+          <SyncWrapper />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            {children}
+            <Footer />
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
