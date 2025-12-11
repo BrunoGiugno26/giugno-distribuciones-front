@@ -10,6 +10,7 @@ export type ProductType = {
         tipoCabello:string;
         origin:string;
         price:number;
+        marca:string;
         images:{
             data:{
                 id:number,
