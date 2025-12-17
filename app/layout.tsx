@@ -1,6 +1,5 @@
 // ./app/layout.tsx
 import { ClerkProvider } from "@clerk/nextjs";
-import SyncWrapper from "@/components/syncWrapper";
 import { esES } from "@clerk/localizations";
 
 import type { Metadata } from "next";
@@ -9,6 +8,8 @@ import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import SyncWrapper from "@/components/sync-wrapper";
 
 const ubuntu = Ubuntu({
   variable: "--font-geist-sans",
@@ -86,6 +87,7 @@ export default function RootLayout({
             <Navbar />
             {children}
             <Footer />
+            <Toaster richColors position="top-right" />
           </ThemeProvider>
         </body>
       </html>
