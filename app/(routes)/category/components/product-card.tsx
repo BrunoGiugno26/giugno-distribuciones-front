@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { Expand, ShoppingCart } from "lucide-react";
+import { Expand } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
@@ -11,6 +11,8 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import React from "react";
+import AddToCartButton from "@/components/cart/add-to-cart-icon";
+import FavoriteButton from "@/components/favorites/favorite-button";
 
 type ProductCardProps = {
   product: ProductType;
@@ -26,23 +28,21 @@ const ProductCard = (props: ProductCardProps) => {
     e.preventDefault();
     router.push(`/product/${product.attributes.slug}`);
   };
-  const handleCartClick = (e: ButtonClickEvent) => {
-    e.preventDefault();
-    console.log("add to cart");
-  };
 
   return (
     <Link
       href={`/product/${product.attributes.slug}`}
       className="relative flex flex-col justify-between h-full p-3 transition-all duration-200 rounded-xl border border-transparent hover:border-slate-200 hover:shadow-xl bg-white dark:bg-slate-900 dark:hover:border-slate-700 group/card"
     >
-      <div className="absolute flex items-center justify-between gap-4 px-2 top-4 left-2 right-2">
+      <div className="absolute top-4 px-2 left-2 right-2 flex flex-wrap gap-2 items-start justify-between">
         <p className="px-2 py-1 text-[10px] font-bold text-white bg-black rounded-full dark:bg-white dark:text-black w-fit uppercase tracking-wider">
           {product.attributes.tipoProducto}
         </p>
         {product.attributes.origin && (
-          <p className="px-2 py-1 text-[10px] font-bold text-black bg-amber-300
-          dark:bg-sky-500 rounded-full w-fit uppercase tracking-wider shadow-sm">
+          <p
+            className="px-2 py-1 text-[10px] font-bold text-black bg-amber-300
+          dark:bg-sky-500 rounded-full w-fit uppercase tracking-wider shadow-sm"
+          >
             {product.attributes.origin}
           </p>
         )}
@@ -56,22 +56,22 @@ const ProductCard = (props: ProductCardProps) => {
                 <img
                   src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${image.attributes.url}`}
                   alt={product.attributes.productName}
-                  className="object-cover w-full h-full p-0 transition-transform duration-500 group-hover:scale-110" 
+                  className="object-cover w-full h-full p-0 transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute w-full px-6 transition duration-200 opacity-0 group-hover:opacity-100 bottom-5 flex justify-center gap-x-3">
+                <div className="absolute w-full px-6 bottom-5 flex justify-center gap-x-3 
+                  opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200">
                   <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                     <IconButton
                       onClick={handleExpandClick as () => void}
-                      icon={<Expand size={18} className="text-gray-600" />}
+                      icon={<Expand size={18} className="cursor-pointer text-gray-600" />}
                     />
                   </div>
+
                   <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                    <IconButton
-                      onClick={handleCartClick as () => void}
-                      icon={
-                        <ShoppingCart size={18} className="text-gray-600" />
-                      }
-                    />
+                    <FavoriteButton product={product}/>
+                  </div>
+                  <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                    <AddToCartButton product={product} />
                   </div>
                 </div>
               </div>

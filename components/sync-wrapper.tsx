@@ -4,17 +4,24 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { useCartStore } from "@/store/cart-store";
 import useClerkStrapiSync from "./hooks/useClerkStrapiSync";
+import { useFavoritesStore } from "@/store/favorites.store";
 
 export default function SyncWrapper() {
   useClerkStrapiSync();
 
-  const { isSignedIn } = useUser();
-  const clearCart = useCartStore((state) => state.clearCart);
+  const { isLoaded, isSignedIn } = useUser();
+  const clearCartSilently = useCartStore((state) => state.clearCartSilently);
+  const clearFavoritesSilently = useFavoritesStore(
+    (state) => state.clearFavoritesSilently
+  );
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     if (!isSignedIn) {
-      clearCart();
+      clearCartSilently();
+      clearFavoritesSilently();
     }
-  }, [isSignedIn, clearCart]);
+  }, [isLoaded, isSignedIn, clearCartSilently, clearFavoritesSilently]);
   return null;
 }

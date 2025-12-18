@@ -1,5 +1,8 @@
 "use client";
+
 import { Heart, ShoppingCart } from "lucide-react";
+import { useCartStore } from "@/store/cart-store";
+import { useFavoritesStore } from "@/store/favorites.store";
 import { useRouter } from "next/navigation";
 import MenuList from "./menu-list";
 import ItemsMenuMobile from "./items-menu-mobile";
@@ -9,9 +12,13 @@ import UserIcon from "./user-icon";
 
 const Navbar = () => {
   const router = useRouter();
+  const totalItems = useCartStore((state) => state.totalItems);
+  const totalFavorites = useFavoritesStore((state) => state.favorites.length);
 
   return (
     <div className="flex items-center justify-between p-4 mx-auto cursor-pointer sm:max-w-4xl md:max-w-6xl lg:max-w-7xl">
+      
+      {/* Logo */}
       <div className="flex items-center" onClick={() => router.push("/")}>
         <h1 className="text-xl sm:text-2xl md:text-3xl whitespace-nowrap hidden md:block">
           Giugno
@@ -26,29 +33,57 @@ const Navbar = () => {
         />
       </div>
 
-      <div className=" hidden md:flex items-center">
+      {/* Menu Desktop */}
+      <div className="hidden md:flex items-center">
         <MenuList />
       </div>
 
+      {/* Menu Mobile */}
       <div className="flex md:hidden">
         <ItemsMenuMobile />
       </div>
 
-      <div className="flex items-center justify-between gap-2 sm:gap-4 md:gap-7">
-        <ShoppingCart
-          strokeWidth={2}
-          className="cursor-pointer"
-          onClick={() => router.push("/cart")}
-        />
-        <Heart
-          strokeWidth={2}
-          className="cursor-pointer"
-          onClick={() => router.push("/loved-products")}
-        />
+      {/* Icons */}
+      <div className="flex items-center gap-4 sm:gap-5 md:gap-6">
+        
+        {/* Carrito */}
+        <div className="relative">
+          <ShoppingCart
+            strokeWidth={2}
+            className="cursor-pointer w-6 h-6"
+            onClick={() => router.push("/cart")}
+          />
+          {totalItems > 0 && (
+            <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full dark:bg-sky-600">
+              {totalItems}
+            </span>
+          )}
+        </div>
+
+        {/* Favoritos */}
+        <div className="relative">
+          <Heart
+            strokeWidth={2}
+            className={`cursor-pointer w-6 h-6 transition ${
+              totalFavorites > 0
+                ? "fill-amber-500 text-amber-600 dark:fill-sky-600 dark:text-sky-800"
+                : "text-gray-800 dark:text-white"
+            }`}
+            onClick={() => router.push("/loved-products")}
+          />
+          {totalFavorites > 0 && (
+            <span className="absolute -top-2 -right-3 bg-amber-600 dark:bg-sky-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+              {totalFavorites}
+            </span>
+          )}
+        </div>
+
         <UserIcon />
         <ToggleTheme />
       </div>
     </div>
   );
 };
+
 export default Navbar;
+

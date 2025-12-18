@@ -1,8 +1,8 @@
 import { ProductType } from "@/types/product";
-import { Heart } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
+import FavoriteButton from "@/components/favorites/favorite-button";
 
 interface ProductInfoProps {
   product: ProductType;
@@ -15,7 +15,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
 
   const handleAddToCart = () => {
     if(!isSignedIn){
-      toast.error("Debes iniciar sesion para agregar productos");
+      toast.error("Debes iniciar sesión para agregar productos");
       return;
     }
     
@@ -50,12 +50,8 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         <span className="text-2xl font-semibold text-amber-600 dark:text-sky-400">
           ${attributes.price}
         </span>
-        <Heart
-          width={30}
-          strokeWidth={2}
-          className="transition duration-300 cursor-pointer hover:fill-amber-600 dark:hover:fill-sky-600"
-          onClick={() => console.log("Add to loved products")}
-        />
+        
+        <FavoriteButton product={product}/>
         <button
           onClick={handleAddToCart}
           className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"

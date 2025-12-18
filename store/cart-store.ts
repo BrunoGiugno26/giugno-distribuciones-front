@@ -16,6 +16,7 @@ type CartState = {
     addToCart: (product: ProductType, quantity?: number) => void
     removeFromCart: (productId: number) => void;
     clearCart: () => void;
+    clearCartSilently: () => void;
     setQuantity: (productId: number, quantity: number) => void;
 };
 
@@ -72,6 +73,10 @@ export const useCartStore = create<CartState>()(
             clearCart: () => {
                 set({ items: [], totalItems: 0, totalPrice: 0 });
                 toast("Carrito Vacio 🧹")
+            },
+
+            clearCartSilently:() =>{
+                set({ items: [], totalItems:0, totalPrice:0});
             },
 
             setQuantity: (productId, quantity) => {

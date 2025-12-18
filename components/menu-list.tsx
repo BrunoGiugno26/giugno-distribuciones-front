@@ -73,7 +73,7 @@ const MenuList = () => {
                       GiugnoDistribuciones
                     </div>
                     <p className="text-muted-foreground text-sm leading-tight">
-                      Somos líderes en la distribucion de cosmética capilar profesional y accesorios en Mendoza, Argentina
+                      Contamos con mas de 40 años en la distribución de cosmética capilar profesional y accesorios en Mendoza.
                     </p>
                   </Link>
                 </NavigationMenuLink>

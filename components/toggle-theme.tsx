@@ -23,7 +23,7 @@ const ToggleTheme = () => {
   
   if (mounted) {
     if (theme === "light") {
-      buttonClasses = `bg-orange-300 hover:bg-yellow-200 text-black border-yellow-500`;
+      buttonClasses = `bg-amber-500 hover:bg-amber-200 text-white border-yellow-500`;
     } else if (theme === "dark") {
       buttonClasses =
         `bg-sky-500 hover:bg-sky-300 text-sky-300 border-sky-600`;
