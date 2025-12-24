@@ -5,16 +5,28 @@ import ProductCard from "../category/components/product-card";
 import ProtectedRoute from "@/components/protectedRoute";
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { useEffect } from "react";
 
 export default function LovedProductsPage() {
   const favorites = useFavoritesStore((state) => state.favorites);
+  const syncFavoritesFromBackend = useFavoritesStore(
+    (s) => s.syncFavoritesFromBackend
+  );
   const clearFavorites = useFavoritesStore((state) => state.clearFavorites);
+  const { user } = useUser();
   const router = useRouter();
+
+  // 🔄 Al montar, sincronizamos con backend
+  useEffect(() => {
+    if (user?.id) {
+      syncFavoritesFromBackend(user.id);
+    }
+  }, [user?.id, syncFavoritesFromBackend]);
 
   return (
     <ProtectedRoute>
       <div className="max-w-7xl mx-auto px-4 py-12 animate-fadeIn">
-
         {/* Título */}
         <h1 className="text-3xl md:text-4xl font-extrabold mb-4 text-center dark:text-white flex items-center justify-center gap-3">
           Productos favoritos ({favorites.length})
@@ -45,7 +57,7 @@ export default function LovedProductsPage() {
             {/* Botón limpiar favoritos */}
             <div className="flex justify-end mb-4">
               <button
-                onClick={clearFavorites}
+                onClick={() => user?.id && clearFavorites(user.id)}
                 className="text-sm text-red-500 hover:underline dark:text-red-400"
               >
                 Limpiar favoritos
@@ -64,8 +76,8 @@ export default function LovedProductsPage() {
                 gap-4 md:gap-6
               "
             >
-              {favorites.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {favorites.map((fav) => (
+                <ProductCard key={fav.id} product={fav.product} />
               ))}
             </div>
           </>
@@ -74,4 +86,3 @@ export default function LovedProductsPage() {
     </ProtectedRoute>
   );
 }
-

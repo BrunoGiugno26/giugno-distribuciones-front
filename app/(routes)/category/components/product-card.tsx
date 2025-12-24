@@ -50,7 +50,7 @@ const ProductCard = (props: ProductCardProps) => {
 
       <Carousel opts={{ align: "start" }} className="w-full mx-auto">
         <CarouselContent>
-          {product.attributes.images.data.map((image) => (
+          {Array.isArray(product.attributes.images?.data) && product.attributes.images.data.map((image) => (
             <CarouselItem key={image.id} className="group">
               <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center">
                 <img

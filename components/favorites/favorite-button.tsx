@@ -8,29 +8,26 @@ import React from "react";
 import { toast } from "sonner";
 
 type Props = {
-    product:ProductType;
-    className?:string;
+  product: ProductType;
+  className?: string;
 };
 
-export default function FavoriteButton({ product }:Props ) {
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
-  const isFavorite = useFavoritesStore((state) =>
-    state.isFavourite(product.id)
-  );
-
+export default function FavoriteButton({ product }: Props) {
+  const toggleFavoriteWithSync = useFavoritesStore((s) => s.toggleFavoriteWithSync);
+  const isFavorite = useFavoritesStore((s) => s.isFavourite(product.id));
   const { user } = useUser();
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) =>{
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if(!user){
-        toast.error("Debes iniciar sesión para agregar productos favoritos ❤️");
-        return;
+    if (!user?.id) {
+      toast.error("Debes iniciar sesión para agregar productos favoritos ❤️");
+      return;
     }
 
-    toggleFavorite(product);
-  }
+    await toggleFavoriteWithSync(product, user.id); // 🔑 ahora siempre backend + sync
+  };
 
   return (
     <button
@@ -39,8 +36,13 @@ export default function FavoriteButton({ product }:Props ) {
     >
       <Heart
         size={20}
-        className={isFavorite ? "fill-amber-500 text-amber-500 dark:fill-sky-600 dark:text-sky-600" : "text-gray-600"}
+        className={
+          isFavorite
+            ? "fill-amber-500 text-amber-500 dark:fill-sky-600 dark:text-sky-600"
+            : "text-gray-600"
+        }
       />
     </button>
   );
 }
+

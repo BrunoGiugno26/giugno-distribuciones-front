@@ -2,13 +2,19 @@ import { ProductType } from "@/types/product";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { toast } from "sonner";
+import { getFavorites, addFavorite, deleteFavorite } from "@/api/favorites";
+import { FavoriteItemBackend } from "@/types/favorite";
+import { FavoriteItem, mapFavoriteItem } from "@/lib/mappers";
 
 interface FavoritesState {
-  favorites: ProductType[];
-  toggleFavorite: (product: ProductType) => void;
+  favorites: FavoriteItem[];
   isFavourite: (id: number) => boolean;
-  clearFavorites: () => void;
-  clearFavoritesSilently: () => void
+  clearFavorites: (userId: string) => Promise<void>;
+  clearFavoritesSilently: () => void;
+  syncFavoritesFromBackend: (userId: string) => Promise<void>;
+  addFavoriteWithSync: (userId: string, productId: number) => Promise<void>;
+  removeFavoriteWithSync: (id: number, userId: string) => Promise<void>;
+  toggleFavoriteWithSync: (product: ProductType, userId: string) => Promise<void>;
 }
 
 export const useFavoritesStore = create<FavoritesState>()(
@@ -16,38 +22,63 @@ export const useFavoritesStore = create<FavoritesState>()(
     (set, get) => ({
       favorites: [],
 
-      toggleFavorite: (product) => {
-        const { favorites } = get();
-        const exists = favorites.some((p) => p.id === product.id);
-
-        const updated = exists
-          ? favorites.filter((p) => p.id !== product.id)
-          : [...favorites, product];
-
-        set({ favorites: updated });
-
-        if (exists) {
-          toast.info("Producto eliminado de favoritos 💔");
-        } else {
-          toast.success("Producto añadido a favoritos ❤️");
-        }
-      },
-
       isFavourite: (id) => {
-        return get().favorites.some((p) => p.id === id);
+        return get().favorites.some((p) => p.product.id === id);
       },
 
-      clearFavorites: () => {
-        set({ favorites: [] });
+      clearFavorites: async (userId: string) => {
+        const { favorites } = get();
+
+        // 🔇 eliminamos directo en backend sin mostrar toast por cada producto
+        for (const fav of favorites) {
+          await deleteFavorite(fav.id);
+        }
+
+        await get().syncFavoritesFromBackend(userId);
+
+        // ✅ mostramos solo un toast final
         toast.success("Favoritos limpiados 🧹");
       },
 
-      clearFavoritesSilently : () => {
+      clearFavoritesSilently: () => {
         set({ favorites: [] });
-      }
+      },
+
+      syncFavoritesFromBackend: async (userId) => {
+        const backendItems: FavoriteItemBackend[] = await getFavorites(userId);
+        const mappedItems = backendItems.map(mapFavoriteItem);
+        set({ favorites: mappedItems });
+      },
+
+      addFavoriteWithSync: async (userId, productId) => {
+        await addFavorite(userId, productId);
+        await get().syncFavoritesFromBackend(userId);
+        toast.success("Producto añadido a favoritos ❤️");
+      },
+
+      removeFavoriteWithSync: async (id, userId) => {
+        await deleteFavorite(id);
+        await get().syncFavoritesFromBackend(userId);
+        toast.info("Producto eliminado de favoritos 💔");
+      },
+
+      toggleFavoriteWithSync: async (product, userId) => {
+        const { favorites, addFavoriteWithSync, removeFavoriteWithSync } = get();
+        const existingFavorite = favorites.find((f) => f.product.id === product.id);
+
+        if (!existingFavorite) {
+          await addFavoriteWithSync(userId, product.id);
+        } else {
+          await removeFavoriteWithSync(existingFavorite.id, userId);
+        }
+      },
     }),
-    {
-      name: "favorites-storage",
-    }
+    { name: "favorites-storage" }
   )
 );
+
+
+
+
+
+

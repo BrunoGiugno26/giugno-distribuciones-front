@@ -9,11 +9,21 @@ import ItemsMenuMobile from "./items-menu-mobile";
 import ToggleTheme from "./toggle-theme";
 import Image from "next/image";
 import UserIcon from "./user-icon";
+import { useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
   const router = useRouter();
   const totalItems = useCartStore((state) => state.totalItems);
-  const totalFavorites = useFavoritesStore((state) => state.favorites.length);
+  const favorites = useFavoritesStore((state) => state.favorites);
+  const { user } = useUser();
+
+  // 🔄 Sincronizar al montar
+  useEffect(() => {
+    if (user?.id) {
+      useFavoritesStore.getState().syncFavoritesFromBackend(user.id);
+    }
+  }, [user?.id]);
 
   return (
     <div className="flex items-center justify-between p-4 mx-auto cursor-pointer sm:max-w-4xl md:max-w-6xl lg:max-w-7xl">
@@ -65,15 +75,15 @@ const Navbar = () => {
           <Heart
             strokeWidth={2}
             className={`cursor-pointer w-6 h-6 transition ${
-              totalFavorites > 0
+              favorites.length > 0
                 ? "fill-amber-500 text-amber-600 dark:fill-sky-600 dark:text-sky-800"
                 : "text-gray-800 dark:text-white"
             }`}
             onClick={() => router.push("/loved-products")}
           />
-          {totalFavorites > 0 && (
+          {favorites.length > 0 && (
             <span className="absolute -top-2 -right-3 bg-amber-600 dark:bg-sky-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
-              {totalFavorites}
+              {favorites.length}
             </span>
           )}
         </div>
@@ -86,4 +96,6 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+
 

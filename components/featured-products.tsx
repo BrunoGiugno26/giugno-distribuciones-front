@@ -23,15 +23,15 @@ import { toast } from "sonner";
 const FeaturedProducts = () => {
   const { result, loading }: ResponseType = useGetFeaturedProducts();
   const router = useRouter();
-  const addToCart = useCartStore((state) => state.addToCart);
+  const addToCartWithSync = useCartStore((state) => state.addToCartWithSync);
   const { user } = useUser();
 
   const handleAddFromFeatured = (product: ProductType) => {
-    if (!user) {
+    if (!user?.id) {
       toast.error("Debes iniciar sesión para agregar al carrito 🛒");
       return;
     }
-    addToCart(product, 1);
+    addToCartWithSync(product, 1, user.id);
   };
 
   return (
@@ -77,7 +77,7 @@ const FeaturedProducts = () => {
                           className="w-full h-full object-cover"
                         />
 
-                        {/* Íconos flotantes con animación responsive */}
+                        {/* Íconos flotantes */}
                         <div
                           className="
                             absolute bottom-4 w-full flex justify-center gap-x-3 px-4
@@ -137,3 +137,4 @@ const FeaturedProducts = () => {
 };
 
 export default FeaturedProducts;
+

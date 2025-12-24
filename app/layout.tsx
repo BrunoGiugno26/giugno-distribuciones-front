@@ -87,7 +87,7 @@ export default function RootLayout({
             <Navbar />
             {children}
             <Footer />
-            <Toaster richColors position="top-right" />
+            <Toaster richColors position="top-right" visibleToasts={1} />
           </ThemeProvider>
         </body>
       </html>

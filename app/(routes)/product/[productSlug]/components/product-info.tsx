@@ -10,16 +10,16 @@ interface ProductInfoProps {
 
 const ProductInfo = ({ product }: ProductInfoProps) => {
   const { attributes } = product;
-  const addToCart = useCartStore((state) => state.addToCart);
-  const { isSignedIn } = useUser();
+  const addToCartWithSync = useCartStore((state) => state.addToCartWithSync);
+  const { user, isSignedIn } = useUser();
 
   const handleAddToCart = () => {
-    if(!isSignedIn){
-      toast.error("Debes iniciar sesión para agregar productos");
+    if (!isSignedIn || !user?.id) {
+      toast.error("Debes iniciar sesión para agregar productos 🛒");
       return;
     }
-    
-    addToCart(product, 1);
+
+    addToCartWithSync(product, 1, user.id);
   };
 
   return (
@@ -40,8 +40,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           {attributes.description}
         </p>
         <p className="text-sm text-amber-600 dark:text-sky-600">
-          Origen: {attributes.origin} | Tipo de cabello:{" "}
-          {attributes.tipoCabello}
+          Origen: {attributes.origin} | Tipo de cabello: {attributes.tipoCabello}
         </p>
       </div>
 
@@ -50,8 +49,8 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         <span className="text-2xl font-semibold text-amber-600 dark:text-sky-400">
           ${attributes.price}
         </span>
-        
-        <FavoriteButton product={product}/>
+
+        <FavoriteButton product={product} />
         <button
           onClick={handleAddToCart}
           className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
@@ -71,3 +70,4 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
 };
 
 export default ProductInfo;
+
