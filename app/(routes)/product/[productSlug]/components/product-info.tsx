@@ -1,8 +1,12 @@
-import { ProductType } from "@/types/product";
-import { useCartStore } from "@/store/cart-store";
-import { useUser } from "@clerk/nextjs";
-import { toast } from "sonner";
+"use client";
+
 import FavoriteButton from "@/components/favorites/favorite-button";
+import { useCartStore } from "@/store/cart-store";
+import { ProductType, VariantType } from "@/types/product";
+import { useUser } from "@clerk/nextjs";
+import { useState, useMemo } from "react";
+import { toast } from "sonner";
+import { Listbox } from "@headlessui/react";
 
 interface ProductInfoProps {
   product: ProductType;
@@ -10,8 +14,40 @@ interface ProductInfoProps {
 
 const ProductInfo = ({ product }: ProductInfoProps) => {
   const { attributes } = product;
-  const addToCartWithSync = useCartStore((state) => state.addToCartWithSync);
+  const items = useCartStore((s) => s.items);
   const { user, isSignedIn } = useUser();
+
+  const variants = attributes.variants?.data ?? [];
+  const [selectedVariant, setSelectedVariant] = useState<VariantType | null>(
+    variants.length > 0 ? variants[0] : null
+  );
+
+  const [quantity, setQuantity] = useState(1);
+
+  // Stock disponible (solo variante si existen variantes)
+  const available =
+    variants.length > 0
+      ? selectedVariant?.attributes.stock ?? 0
+      : attributes.stock ?? 0;
+
+  // Cantidad actual en el carrito para este producto+variante
+  const cartQuantity = useMemo(() => {
+    return (
+      items.find(
+        (i) =>
+          i.product.id === product.id &&
+          (variants.length > 0 && selectedVariant
+            ? i.variant?.id === selectedVariant.id
+            : !i.variant)
+      )?.quantity ?? 0
+    );
+  }, [items, product.id, selectedVariant, variants.length]);
+
+  // Quedante considerando lo que ya está en el carrito
+  const remaining = Math.max(available - cartQuantity, 0);
+
+  // Bloqueo si no hay variante seleccionada (cuando hay variantes)
+  const variantRequired = variants.length > 0 && !selectedVariant;
 
   const handleAddToCart = () => {
     if (!isSignedIn || !user?.id) {
@@ -19,7 +55,33 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
       return;
     }
 
-    addToCartWithSync(product, 1, user.id);
+    if (available <= 0) {
+      toast.error("Sin stock para este producto/tono");
+      return;
+    }
+    if (variantRequired) {
+      toast.error("Debes seleccionar un tono antes de agregar");
+      return;
+    }
+    if (quantity < 1) {
+      toast.error("La cantidad mínima es 1");
+      return;
+    }
+    if (quantity > remaining) {
+      toast.error("No podés agregar más unidades que el stock disponible");
+      return;
+    }
+
+    useCartStore
+      .getState()
+      .addToCartWithSync(
+        product,
+        quantity,
+        user.id,
+        selectedVariant ?? undefined
+      );
+
+    toast.success("Producto añadido al carrito 🛒");
   };
 
   return (
@@ -33,41 +95,125 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           Marca: {attributes.marca}
         </p>
       </div>
-
       {/* Descripción */}
       <div className="space-y-3">
         <p className="text-gray-700 dark:text-gray-300">
           {attributes.description}
         </p>
         <p className="text-sm text-amber-600 dark:text-sky-600">
-          Origen: {attributes.origin} | Tipo de cabello: {attributes.tipoCabello}
+          Origen: {attributes.origin} | Tipo de cabello:{" "}
+          {attributes.tipoCabello}
         </p>
       </div>
+      {/* Selector de variantes */}
+      {variants.length > 0 && (
+        <div className="w-full sm:max-w-xs">
+          <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+            Elegí el tono:
+          </label>
 
-      {/* Precio y botones */}
+          <Listbox value={selectedVariant} onChange={setSelectedVariant}>
+            <div className="relative">
+              <Listbox.Button className="w-full rounded-md border px-3 py-2 bg-amber-50 dark:bg-sky-950  font-semibold text-gray-900 dark:text-white text-left text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-sky-600">
+                {selectedVariant
+                  ? `Tono ${selectedVariant.attributes.code}`
+                  : "Seleccioná un tono..."}
+              </Listbox.Button>
+
+              <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md border bg-white dark:bg-gray-800 shadow-lg z-10">
+                {variants.map((v) => (
+                  <Listbox.Option
+                    key={v.id}
+                    value={v}
+                    className={({ active }) =>
+                      `cursor-pointer px-3 py-2 text-sm ${
+                        active
+                          ? "bg-amber-600 dark:bg-sky-800 text-white"
+                          : "text-gray-900 dark:text-white"
+                      }`
+                    }
+                  >
+                    {`Tono ${v.attributes.code} - ${v.attributes.stock} ud.`}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </div>
+          </Listbox>
+
+          {/* Preview del tono */}
+          {selectedVariant && (
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <p className="font-medium text-gray-800 dark:text-gray-200">
+                Tono seleccionado: {selectedVariant.attributes.code}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+      {/* Stock disponible */}
+      {variants.length > 0 ? (
+        selectedVariant ? (
+          <p className="text-sm text-amber-600 dark:text-sky-600">
+            {remaining > 0
+              ? `Stock disponible: ${remaining}`
+              : "Sin stock para este tono"}
+          </p>
+        ) : (
+          <p className="text-sm text-gray-500 italic">
+            Seleccioná un tono para ver el stock
+          </p>
+        )
+      ) : (
+        <p className="text-sm text-gray-700 dark:text-gray-500">
+          {remaining > 0
+            ? `Stock disponible: ${remaining}`
+            : "Sin stock para este producto"}
+        </p>
+      )}
+      {remaining <= 3 && remaining > 0 && (
+        <p className="text-md text-red-500">
+          ¡Quedan solo {remaining} unidades!
+        </p>
+      )}
+      {cartQuantity >= available && available > 0 && (
+        <p className="text-sm text-red-500">
+          Ya tenés el máximo disponible en el carrito
+        </p>
+      )}
+      {/* Precio, favoritos y cantidad */}{" "}
       <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
-        <span className="text-2xl font-semibold text-amber-600 dark:text-sky-400">
-          ${attributes.price}
+        <span className="text-3xl font-semibold text-amber-600 dark:text-sky-400">
+          ${attributes.price + (selectedVariant?.attributes.priceDelta ?? 0)}{" "}
         </span>
+        <FavoriteButton product={product} /> {/* Input cantidad + botón */}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={quantity}
+            onChange={(e) => {
+              const raw = e.target.value;
+              const digitsOnly = raw.replace(/\D/g, "");
+              const cleaned = digitsOnly.replace(/^0+/, "");
+              let parsed = cleaned === "" ? 0 : parseInt(cleaned, 10);
 
-        <FavoriteButton product={product} />
-        <button
-          onClick={handleAddToCart}
-          className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
-        >
-          Añadir al carrito
-        </button>
-      </div>
+              if (parsed > 100) parsed = 100;
+              setQuantity(parsed);
+            }}
+            className="w-16 px-2 py-1 border rounded text-center appearance-none"
+          />
 
-      {/* CTA principal */}
-      <div className="pt-2">
-        <button className="h-12 w-full sm:max-w-xs rounded-full bg-amber-600 text-white font-semibold hover:bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-500">
-          Comprar ahora
-        </button>
+          <button
+            onClick={handleAddToCart}
+            disabled={available <= 0 || variantRequired}
+            className="px-4 py-2 cursor-pointer bg-amber-600 dark:bg-sky-600 text-white rounded-lg hover:bg-amber-400 dark:hover:bg-sky-400 disabled:bg-gray-400"
+          >
+            Añadir al carrito
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default ProductInfo;
-

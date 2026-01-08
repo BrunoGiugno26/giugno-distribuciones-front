@@ -1,17 +1,6 @@
-import { CartItemBackend } from "@/types/cart";
+import { CartItem, CartItemBackend } from "@/types/cart";
 import { FavoriteItemBackend } from "@/types/favorite";
 import { ProductType } from "@/types/product";
-
-export type CartItem = {
-  id: number;
-  product: ProductType;
-  quantity: number;
-};
-
-export type FavoriteItem = {
-  id: number;
-  product: ProductType;
-};
 
 const placeholderProduct: ProductType = {
   id: -1,
@@ -22,6 +11,7 @@ const placeholderProduct: ProductType = {
     origin: "",
     tipoCabello: "",
     price: 0,
+    stock: 0,
     slug: "",
     images: { data: [] },
     active: false,
@@ -34,12 +24,14 @@ const placeholderProduct: ProductType = {
 // 🛒 Mapper de carrito
 export const mapCartItem = (backend: CartItemBackend): CartItem => {
   const productData = backend.attributes.product?.data;
+  const variantData = backend.attributes.variant?.data ?? undefined;
 
   if (!productData) {
     console.warn("⚠️ Producto faltante en cart-item:", backend);
     return {
       id: backend.id,
       product: placeholderProduct,
+      variant: variantData,
       quantity: backend.attributes.quantity,
     };
   }
@@ -47,11 +39,17 @@ export const mapCartItem = (backend: CartItemBackend): CartItem => {
   return {
     id: backend.id,
     product: productData,
+    variant: variantData,
     quantity: backend.attributes.quantity,
   };
 };
 
 // ❤️ Mapper de favoritos
+export type FavoriteItem = {
+  id: number;
+  product: ProductType;
+};
+
 export const mapFavoriteItem = (backend: FavoriteItemBackend): FavoriteItem => {
   const productData = backend.attributes.product?.data;
 
@@ -68,4 +66,5 @@ export const mapFavoriteItem = (backend: FavoriteItemBackend): FavoriteItem => {
     product: productData,
   };
 };
+
 

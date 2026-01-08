@@ -24,9 +24,9 @@ const CarouselProduct = ({ products, activeIndex, setActiveIndex }: CarouselProd
       {/* Botón volver */}
     <Button
         onClick={() => router.back()}
-        className="text-sm bg-amber-600 hover:bg-amber-500 dark:text-white dark:bg-sky-600  dark:hover:bg-sky-500"
+        className="text-sm rounded-full bg-amber-600 hover:bg-amber-500 dark:text-white dark:bg-sky-600  dark:hover:bg-sky-500"
       >
-        ⬅️Volver a la categoria
+        ⬅️ Volver
       </Button>
 
       {/* Carrusel */}

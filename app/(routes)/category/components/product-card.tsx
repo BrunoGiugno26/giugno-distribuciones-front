@@ -63,7 +63,7 @@ const ProductCard = (props: ProductCardProps) => {
                   <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                     <IconButton
                       onClick={handleExpandClick as () => void}
-                      icon={<Expand size={18} className="cursor-pointer text-gray-600" />}
+                      icon={<Expand size={25} className="cursor-pointer text-gray-600" />}
                     />
                   </div>
 

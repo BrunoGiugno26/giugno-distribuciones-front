@@ -13,26 +13,14 @@ import {
 import SkeletonSchema from "./ui/skeletonSchema";
 import { ProductType } from "@/types/product";
 import { Card } from "./ui/card";
-import { Expand, ShoppingCart } from "lucide-react";
+import { Expand } from "lucide-react";
 import { useRouter } from "next/navigation";
 import IconButton from "./icon-button";
-import { useCartStore } from "@/store/cart-store";
-import { useUser } from "@clerk/nextjs";
-import { toast } from "sonner";
+import FavoriteButton from "@/components/favorites/favorite-button";
 
 const FeaturedProducts = () => {
   const { result, loading }: ResponseType = useGetFeaturedProducts();
   const router = useRouter();
-  const addToCartWithSync = useCartStore((state) => state.addToCartWithSync);
-  const { user } = useUser();
-
-  const handleAddFromFeatured = (product: ProductType) => {
-    if (!user?.id) {
-      toast.error("Debes iniciar sesión para agregar al carrito 🛒");
-      return;
-    }
-    addToCartWithSync(product, 1, user.id);
-  };
 
   return (
     <div className="max-w-7xl py-4 mx-auto sm:py-16 sm:px-24">
@@ -87,22 +75,19 @@ const FeaturedProducts = () => {
                             transition-all duration-300 ease-out
                           "
                         >
+                          {/* Expandir */}
                           <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                             <IconButton
                               onClick={() => router.push(`product/${slug}`)}
                               icon={
-                                <Expand className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 cursor-pointer text-gray-600" />
+                                <Expand className="w-6 h-6 sm:w-6 sm:h-6 md:w-6 md:h-6 cursor-pointer text-gray-600" />
                               }
                             />
                           </div>
 
+                          {/* Favorito */}
                           <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                            <IconButton
-                              onClick={() => handleAddFromFeatured(product)}
-                              icon={
-                                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 cursor-pointer text-gray-600" />
-                              }
-                            />
+                            <FavoriteButton product={product} />
                           </div>
                         </div>
                       </div>

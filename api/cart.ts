@@ -8,7 +8,7 @@ export const getCartItems = async (userId: string): Promise<CartItemBackend[]> =
   const res = await axios.get<{ data: CartItemBackend[] }>(`${API_URL}/api/cart-items`, {
     params: {
       filters: { userId: { $eq: userId } },
-      populate: ["product", "product.images"],
+      populate: ["product", "product.images","variant"],
     },
   });
   console.log("✅ Cart items recibidos:", res.data.data);
@@ -18,13 +18,16 @@ export const getCartItems = async (userId: string): Promise<CartItemBackend[]> =
 export const addCartItem = async (
   userId: string,
   productId: number,
-  quantity: number
+  quantity: number,
+  variantId?:number
 ): Promise<CartItemBackend> => {
   console.log("➕ addCartItem → userId:", userId, "productId:", productId, "quantity:", quantity);
   const res = await axios.post<{ data: CartItemBackend }>(
     `${API_URL}/api/cart-items`,
-    { data: { userId, product: productId, quantity } },
-    { params: { populate: ["product", "product.images"] } }
+    { data: { userId, product: productId, quantity, ...(variantId ? {variant:variantId }: {}),
+   }, 
+  },
+    { params: { populate: ["product", "product.images","variant"] } }
   );
   console.log("✅ Cart item creado:", res.data.data);
   return res.data.data;
@@ -39,7 +42,7 @@ export const updateCartItem = async (
     const res = await axios.put<{ data: CartItemBackend }>(
       `${API_URL}/api/cart-items/${id}`,
       { data: { quantity } },
-      { params: { populate: ["product", "product.images"] } }
+      { params: { populate: ["product", "product.images","variant"] } }
     );
     console.log("✅ Cart item actualizado:", res.data.data);
     return res.data.data;

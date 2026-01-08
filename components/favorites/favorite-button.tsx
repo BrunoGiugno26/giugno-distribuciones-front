@@ -35,7 +35,7 @@ export default function FavoriteButton({ product }: Props) {
       className="p-2 rounded-full bg-amber-100 dark:bg-sky-200 shadow-md hover:scale-110 cursor-pointer transition"
     >
       <Heart
-        size={20}
+        size={25}
         className={
           isFavorite
             ? "fill-amber-500 text-amber-500 dark:fill-sky-600 dark:text-sky-600"

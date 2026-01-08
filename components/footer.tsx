@@ -46,8 +46,8 @@ const Footer = () => {
         <Separator className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8"/>
 
         <span className="block text-sm text-gray-500 sm:text-center dark:text-gray-400">
-            &copy; 2025 
-            <Link href={"#"}>GiugnoDistribuciones Todos los derechos reservados</Link> 
+            &copy; 2026 
+            <Link href={"#"}> GiugnoDistribuciones Todos los derechos reservados</Link> 
             
         </span>
       </div>

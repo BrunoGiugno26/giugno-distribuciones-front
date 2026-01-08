@@ -1,4 +1,4 @@
-import { ProductType } from "./product";
+import { ProductType, VariantType } from "./product";
 
 export type CartItemBackend = {
     id: number;
@@ -6,8 +6,16 @@ export type CartItemBackend = {
         userId: string;
         quantity: number;
         product: { data: ProductType };
+        variant?: { data: VariantType | null};
         createdAt: string;
         updatedAt: string;
         publishedAt: string;
-    }
+    };
+};
+
+export type CartItem = {
+    id: number;
+    product:ProductType;
+    variant?: VariantType;
+    quantity:number;
 }

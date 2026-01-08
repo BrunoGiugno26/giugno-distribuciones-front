@@ -14,7 +14,7 @@ import { useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
   const router = useRouter();
-  const totalItems = useCartStore((state) => state.totalItems);
+  const cartItems = useCartStore((state) => state.items);
   const favorites = useFavoritesStore((state) => state.favorites);
   const { user } = useUser();
 
@@ -24,6 +24,16 @@ const Navbar = () => {
       useFavoritesStore.getState().syncFavoritesFromBackend(user.id);
     }
   }, [user?.id]);
+
+  const distinctItems = cartItems.length;
+
+  const lowStock = cartItems.some((items) => {
+    const stock = items.variant
+    ? items.variant.attributes.stock
+    :items.product.attributes.stock ?? 0
+    const remaining = stock - items.quantity;
+    return remaining > 0 && remaining <= 3
+  });
 
   return (
     <div className="flex items-center justify-between p-4 mx-auto cursor-pointer sm:max-w-4xl md:max-w-6xl lg:max-w-7xl">
@@ -63,9 +73,14 @@ const Navbar = () => {
             className="cursor-pointer w-6 h-6"
             onClick={() => router.push("/cart")}
           />
-          {totalItems > 0 && (
+          {distinctItems > 0 && (
             <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full dark:bg-sky-600">
-              {totalItems}
+              {distinctItems}
+            </span>
+          )}
+          {lowStock && (
+            <span className="absolute -bottom-2 -right-2 text-red-500 text-xs font-bold">
+              ⚠️
             </span>
           )}
         </div>
