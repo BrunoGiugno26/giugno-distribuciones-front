@@ -121,21 +121,30 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
               </Listbox.Button>
 
               <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md border bg-white dark:bg-gray-800 shadow-lg z-10">
-                {variants.map((v) => (
-                  <Listbox.Option
-                    key={v.id}
-                    value={v}
-                    className={({ active }) =>
-                      `cursor-pointer px-3 py-2 text-sm ${
-                        active
-                          ? "bg-amber-600 dark:bg-sky-800 text-white"
-                          : "text-gray-900 dark:text-white"
-                      }`
-                    }
-                  >
-                    {`Tono ${v.attributes.code} - ${v.attributes.stock} ud.`}
-                  </Listbox.Option>
-                ))}
+                {variants.map((v) => {
+                  const cartQuantityForVariant =
+                    items.find((i) => i.variant?.id === v.id)?.quantity ?? 0;
+                  return (
+                    <Listbox.Option
+                      key={v.id}
+                      value={v}
+                      className={({ active }) =>
+                        `cursor-pointer px-3 py-2 text-sm ${
+                          active
+                            ? "bg-amber-600 dark:bg-sky-800 text-white"
+                            : "text-gray-900 dark:text-white"
+                        }`
+                      }
+                    >
+                      {`Tono ${v.attributes.code} - ${v.attributes.stock} ud`}
+                      {cartQuantityForVariant > 0 && (
+                        <span className="ml-2 text-xs">
+                          (ya agregaste {cartQuantityForVariant})
+                        </span>
+                      )}
+                    </Listbox.Option>
+                  );
+                })}
               </Listbox.Options>
             </div>
           </Listbox>

@@ -123,7 +123,7 @@ export default function CartPage() {
                       <h2 className="font-semibold">
                         {attributes.productName}
                       </h2>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-300">
                         Marca: {attributes.marca}
                       </p>
 
