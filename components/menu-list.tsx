@@ -97,66 +97,66 @@ export default MenuList
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "Shampoo",
-    href: "/productos/shampoo",
+    href: "/products/shampoo",
     description:
       "Productos de limpieza profunda o suave, formulados para tratar el cuero cabelludo y la fibra capilar.",
   },
   {
     title: "Acondicionador",
-    href: "/productos/acondicionador",
+    href: "/products/acondicionador",
     description:
       "Fórmulas para sellar la cutícula, aportar brillo y facilitar el desenredado después del lavado.",
   },
   {
-    title: "Baño de Crema",
-    href: "/productos/bano-de-crema",
+    title: "Baños de Cremas",
+    href: "/products/bano-de-crema",
     description:
       "Tratamientos intensivos de reparación e hidratación profunda para restaurar cabellos secos o dañados.",
   },
   {
     title: "Tónicos Capilares",
-    href: "/productos/tonicos-capilares",
+    href: "/products/tonicos-capilares",
     description: "Soluciones líquidas concentradas para estimular el crecimiento y fortalecer el cabello desde la raíz.",
   },
   {
     title: "Tinturas",
-    href: "/productos/tinturas",
+    href: "/products/tinturas",
     description:
       "Coloraciones permanentes y semipermanentes con una amplia gama de tonos para resultados duraderos.",
   },
   {
     title: "Decolorantes",
-    href: "/productos/decolorantes",
+    href: "/products/decolorantes",
     description:
       "Productos en polvo o crema para remover el color natural o artificial, preparando el cabello para la coloración.",
   },
   {
     title: "Ampollas",
-    href: "/productos/ampollas",
+    href: "/products/ampollas",
     description:
       "Tratamientos concentrados de dosis única que proporcionan un refuerzo instantáneo de brillo y vitalidad.",
   },
   {
     title: "Accesorios",
-    href: "/productos/accesorios",
+    href: "/products/accesorios",
     description:
       "Herramientas de uso profesional y personal, incluyendo peines, cepillos y elementos para la aplicación de productos.",
   },
   {
     title: "Reveladores Oxidantes",
-    href: "/productos/reveladores-oxidantes",
+    href: "/products/reveladores-oxidantes",
     description:
       "Agentes químicos que se mezclan con las tinturas o decolorantes para activar la acción del color.",
   },
   {
     title: "Reparador de Puntas",
-    href: "/productos/rep-puntas",
+    href: "/products/rep-puntas",
     description:
       "Agentes químicos que se mezclan con las tinturas o decolorantes para activar la acción del color.",
   },
   {
     title: "Finalizadores",
-    href: "/productos/finalizadores",
+    href: "/products/finalizadores",
     description:
       "Agentes químicos que se mezclan con las tinturas o decolorantes para activar la acción del color.",
   },

@@ -3,3 +3,10 @@ export type ResponseType = {
     loading: boolean;
     error: string | null;
 }
+
+export type PaginationMeta = {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+};

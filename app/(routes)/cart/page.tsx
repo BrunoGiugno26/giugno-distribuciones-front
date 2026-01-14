@@ -123,12 +123,12 @@ export default function CartPage() {
                       <h2 className="font-semibold">
                         {attributes.productName}
                       </h2>
-                      <p className="text-sm text-gray-300">
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
                         Marca: {attributes.marca}
                       </p>
 
                       {variant && (
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-700 dark:text-gray-500">
                           Variante:{" "}
                           <span className="font-medium">
                             {variant.attributes.code}
@@ -136,7 +136,7 @@ export default function CartPage() {
                         </p>
                       )}
 
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-700 dark:text-gray-500">
                         Stock restante:{" "}
                         <span
                           className={
@@ -157,7 +157,7 @@ export default function CartPage() {
 
                       {/* Cantidad editable + botón actualizar */}
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="text-sm text-gray-500">Cantidad:</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-500">Cantidad:</span>
                         <input
                           type="text"
                           inputMode="numeric"
@@ -178,7 +178,7 @@ export default function CartPage() {
                           onClick={() =>
                             handleQuantityChange(item.id, currentLocal, stock)
                           }
-                          className="px-2 py-1 text-sm cursor-pointer bg-amber-600 rounded hover:bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-500"
+                          className="px-2 py-1 text-sm cursor-pointer text-white bg-amber-600 rounded hover:bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-500"
                         >
                           Actualizar
                         </button>
