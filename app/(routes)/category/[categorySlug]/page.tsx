@@ -37,7 +37,7 @@ export default function Page() {
     <div className="max-w-7xl p-4 mx-auto sm:py-16 sm:px-12">
       {products.length > 0 && !loading && (
         <h1 className="text-xl sm:text-3xl font-bold text-center mb-8 uppercase tracking-wider text-slate-900 dark:text-slate-100">
-          PRODUCTOS PARA{" "}
+          Sección{" "}
           <span className="text-amber-500 dark:text-sky-500 block sm:inline-block">
             {products[0].attributes.category.data.attributes.categoryName}
           </span>

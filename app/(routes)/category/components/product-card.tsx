@@ -13,14 +13,15 @@ import {
 import React from "react";
 import AddToCartButton from "@/components/cart/add-to-cart-icon";
 import FavoriteButton from "@/components/favorites/favorite-button";
+import { useCartStore } from "@/store/cart-store";
 
 type ProductCardProps = {
   product: ProductType;
 };
 
-const ProductCard = (props: ProductCardProps) => {
-  const { product } = props;
+const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
+  const items = useCartStore((s) => s.items);
 
   type ButtonClickEvent = React.MouseEvent<HTMLButtonElement, MouseEvent>;
 
@@ -28,6 +29,18 @@ const ProductCard = (props: ProductCardProps) => {
     e.preventDefault();
     router.push(`/product/${product.attributes.slug}`);
   };
+
+  const variantCount = product.attributes.variants?.data?.length ?? 0;
+  const hasVariants = variantCount > 0;
+
+  const stockGeneral = product.attributes.stock ?? 0;
+
+  const cartQuantity = items.find(
+    (i) => i.product.id === product.id && !i.variant
+  ) ?.quantity ?? 0;
+
+  const remaining = Math.max(stockGeneral - cartQuantity, 0);
+  const isLowStock = remaining > 0 && remaining <=3
 
   return (
     <Link
@@ -46,37 +59,52 @@ const ProductCard = (props: ProductCardProps) => {
             {product.attributes.origin}
           </p>
         )}
+        {hasVariants && (
+          <p className="px-2 py-1 text[10px] font-bold text-white bg-blue-600 rounded-full w-fit uppercase tracking-wider shadow-sm">
+            Producto con variantes
+          </p>
+        )}
       </div>
 
       <Carousel opts={{ align: "start" }} className="w-full mx-auto">
         <CarouselContent>
-          {Array.isArray(product.attributes.images?.data) && product.attributes.images.data.map((image) => (
-            <CarouselItem key={image.id} className="group">
-              <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center">
-                <img
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${image.attributes.url}`}
-                  alt={product.attributes.productName}
-                  className="object-cover w-full h-full p-0 transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute w-full px-6 bottom-5 flex justify-center gap-x-3 
-                  opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200">
-                  <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                    <IconButton
-                      onClick={handleExpandClick as () => void}
-                      icon={<Expand size={25} className="cursor-pointer text-gray-600" />}
-                    />
-                  </div>
+          {Array.isArray(product.attributes.images?.data) &&
+            product.attributes.images.data.map((image) => (
+              <CarouselItem key={image.id} className="group">
+                <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center">
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${image.attributes.url}`}
+                    alt={product.attributes.productName}
+                    className="object-cover w-full h-full p-0 transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div
+                    className="absolute w-full px-6 bottom-5 flex justify-center gap-x-3 
+                  opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200"
+                  >
+                    <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                      <IconButton
+                        onClick={handleExpandClick as () => void}
+                        icon={
+                          <Expand
+                            size={25}
+                            className="cursor-pointer text-gray-600"
+                          />
+                        }
+                      />
+                    </div>
 
-                  <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                    <FavoriteButton product={product}/>
-                  </div>
-                  <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                    <AddToCartButton product={product} />
+                    <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                      <FavoriteButton product={product} />
+                    </div>
+                    {!hasVariants && (
+                      <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                        <AddToCartButton product={product} />
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            </CarouselItem>
-          ))}
+              </CarouselItem>
+            ))}
         </CarouselContent>
       </Carousel>
 
@@ -90,6 +118,22 @@ const ProductCard = (props: ProductCardProps) => {
         <p className="font-bold text-lg text-center text-amber-600 dark:text-sky-400">
           {formatPrice(product.attributes.price)}
         </p>
+        {hasVariants ? (
+          <p className="text-sm text-center font-semibold text-amber-600 dark:text-sky-600">
+            Variantes disponibles - ver en el detalle
+          </p>
+        ) : remaining > 0 ? (
+          <>
+            <p className="text-sm font-semibold text-green-600">En stock</p>
+            {isLowStock && (
+              <p className="text-sm font-semibold text-red-500">
+                ¡Quedan solo {remaining} unidades!
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="text-sm font-semibold text-red-500">Sin stock</p>
+        )}
       </div>
     </Link>
   );

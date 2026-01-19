@@ -173,7 +173,7 @@ export default function ProductTypePage() {
               </div>
               <button
                 onClick={handleClearFilters}
-                className="px-3 py-1 bg-amber-500 text-white rounded hover:bg-amber-600"
+                className="px-3 py-1 bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-700 text-white rounded hover:bg-amber-600"
               >
                 Quitar filtros
               </button>
