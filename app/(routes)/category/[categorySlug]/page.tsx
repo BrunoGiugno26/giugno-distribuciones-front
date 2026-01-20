@@ -1,25 +1,53 @@
 "use client";
 import { useGetCategoryProduct } from "@/api/getCategoryProduct";
 import { Separator } from "@/components/ui/separator";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import FiltersControlsCategory from "../components/filters-controls-category";
 import SkeletonSchema from "@/components/ui/skeletonSchema";
 import ProductCard from "../components/product-card";
 import { ProductType } from "@/types/product";
 import { useEffect, useState } from "react";
+import Pagination from "@/components/pagination/Pagination";
 
 export default function Page() {
-  const params = useParams();
-  const { categorySlug } = params;
+  const { categorySlug } = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [filterBrand, setFilterBrand] = useState("");
-  const [filterTipoProducto, setFilterTipoProducto] = useState("");
-  const [page, setPage] = useState(1);
+  const initialBrand = searchParams.get("brand") ?? "";
+  const initialTipo = searchParams.get("tipoProducto") ?? "";
+  const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
+
+  const [filterBrand, setFilterBrand] = useState(initialBrand);
+  const [filterTipoProducto, setFilterTipoProducto] = useState(initialTipo);
+  const [page, setPage] = useState(initialPage);
+
+  const updateUrl = (params: {
+    brand?: string;
+    tipoProducto?: string;
+    page?: number;
+  }) => {
+    const query = new URLSearchParams();
+
+    if (params.brand && params.brand.trim() !== "")
+      query.set("brand", params.brand);
+    if (params.tipoProducto && params.tipoProducto.trim() !== "")
+      query.set("tipoProducto", params.tipoProducto);
+    if (params.page && params.page > 1) query.set("page", String(params.page));
+
+    const qs = query.toString();
+    router.push(qs ? `?${qs}` : "?");
+  };
 
   // ✅ Resetear página solo si no está en 1
   useEffect(() => {
     if (page !== 1) {
       setPage(1);
+      updateUrl({
+        brand: filterBrand,
+        tipoProducto: filterTipoProducto,
+        page: 1,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterBrand, filterTipoProducto]);
@@ -28,7 +56,7 @@ export default function Page() {
     categorySlug as string,
     { marca: filterBrand, tipoProducto: filterTipoProducto },
     page,
-    12
+    12,
   );
 
   const products = Array.isArray(result) ? result : [];
@@ -37,7 +65,7 @@ export default function Page() {
     <div className="max-w-7xl p-4 mx-auto sm:py-16 sm:px-12">
       {products.length > 0 && !loading && (
         <h1 className="text-xl sm:text-3xl font-bold text-center mb-8 uppercase tracking-wider text-slate-900 dark:text-slate-100">
-          Sección{" "}
+          Categoría{" "}
           <span className="text-amber-500 dark:text-sky-500 block sm:inline-block">
             {products[0].attributes.category.data.attributes.categoryName}
           </span>
@@ -50,8 +78,16 @@ export default function Page() {
         {/* Filtros */}
         <div className="w-full lg:w-64 shrink-0">
           <FiltersControlsCategory
-            setFilterBrand={setFilterBrand}
-            setFilterTipoProducto={setFilterTipoProducto}
+            setFilterBrand={(brand) => {
+              setFilterBrand(brand);
+              setPage(1);
+              updateUrl({ brand, tipoProducto: filterTipoProducto, page: 1 });
+            }}
+            setFilterTipoProducto={(tipo) => {
+              setFilterTipoProducto(tipo);
+              setPage(1);
+              updateUrl({ brand: filterBrand, tipoProducto: tipo, page: 1 });
+            }}
           />
         </div>
 
@@ -71,41 +107,21 @@ export default function Page() {
 
           {/* Paginador */}
           {meta && meta.pageCount > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-              >
-                ←
-              </button>
-
-              {Array.from({ length: meta.pageCount }, (_, i) => i + 1).map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setPage(num)}
-                  className={`px-3 py-1 rounded ${
-                    page === num
-                      ? "bg-amber-500 text-black dark:bg-sky-600 dark:text-white"
-                      : "bg-gray-200 hover:bg-gray-300"
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
-
-              <button
-                disabled={page === meta.pageCount}
-                onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-              >
-                →
-              </button>
-            </div>
+            <Pagination
+              page={page}
+              pageCount={meta.pageCount}
+              onPageChange={(newPage) => {
+                setPage(newPage);
+                updateUrl({
+                  brand: filterBrand,
+                  tipoProducto: filterTipoProducto,
+                  page: newPage,
+                });
+              }}
+            />
           )}
         </div>
       </div>
     </div>
   );
 }
-

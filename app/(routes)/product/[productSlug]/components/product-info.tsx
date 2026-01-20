@@ -7,6 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Listbox } from "@headlessui/react";
+import ShareButtons from "@/components/shareButtons";
 
 interface ProductInfoProps {
   product: ProductType;
@@ -221,6 +222,11 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           </button>
         </div>
       </div>
+
+      <ShareButtons
+      className="mt-4"
+      label="Compartir este producto"
+      />
     </div>
   );
 };

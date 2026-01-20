@@ -4,25 +4,55 @@ import { useFavoritesStore } from "@/store/favorites.store";
 import ProductCard from "../category/components/product-card";
 import ProtectedRoute from "@/components/protectedRoute";
 import { Heart } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState, useCallback} from "react";
+import Pagination from "@/components/pagination/Pagination";
 
 export default function LovedProductsPage() {
   const favorites = useFavoritesStore((state) => state.favorites);
-  const syncFavoritesFromBackend = useFavoritesStore(
-    (s) => s.syncFavoritesFromBackend
-  );
+  const syncFavoritesFromBackend = useFavoritesStore((s) => s.syncFavoritesFromBackend);
   const clearFavorites = useFavoritesStore((state) => state.clearFavorites);
   const { user } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // 🔄 Al montar, sincronizamos con backend
+  // 🔄 Sincronizar con backend al montar
   useEffect(() => {
     if (user?.id) {
       syncFavoritesFromBackend(user.id);
     }
   }, [user?.id, syncFavoritesFromBackend]);
+
+  // 📍 Estado inicial desde URL
+  const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
+  const [page, setPage] = useState(initialPage);
+  const pageSize = 5;
+
+  const updateUrl = useCallback((newPage: number) => {
+    const query = new URLSearchParams();
+    if (newPage > 1) query.set("page", String(newPage));
+    const qs = query.toString();
+    router.push(qs ? `?${qs}` : "?");
+  }, [router]);
+
+  const pageCount = Math.max(1, Math.ceil(favorites.length / pageSize));
+  const safePage = Math.max(1, Math.min(page, pageCount));
+
+  const paginatedFavorites = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    const end = start + pageSize;
+    return favorites.slice(start, end);
+  }, [favorites, safePage, pageSize]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
+  if (page !== safePage) {
+    setPage(safePage);
+    updateUrl(safePage);
+  }
+}, [safePage, page, updateUrl]);
+
 
   return (
     <ProtectedRoute>
@@ -38,15 +68,14 @@ export default function LovedProductsPage() {
           Aca encontrarás todos los productos que marcaste como favoritos.
         </p>
 
-        {/* Si no hay favoritos */}
+        {/* Vacío */}
         {favorites.length === 0 ? (
           <div className="flex flex-col justify-center items-center py-16">
             <p className="text-lg text-gray-600 dark:text-gray-400">
               Todavía no tienes productos favoritos.
             </p>
-
             <button
-              onClick={() => router.push("/productos")}
+              onClick={() => router.push("/category/peluquerias-y-perfumerias")}
               className="mt-6 px-5 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition dark:bg-sky-600 dark:hover:bg-sky-700"
             >
               Ver productos
@@ -54,17 +83,23 @@ export default function LovedProductsPage() {
           </div>
         ) : (
           <>
-            {/* Botón limpiar favoritos */}
+            {/* Limpiar favoritos */}
             <div className="flex justify-end mb-4">
               <button
-                onClick={() => user?.id && clearFavorites(user.id)}
-                className="text-sm text-red-500 hover:underline dark:text-red-400"
+                onClick={() => {
+                  if (user?.id) {
+                    clearFavorites(user.id);
+                    setPage(1);
+                    updateUrl(1);
+                  }
+                }}
+                className="px-4 py-2 bg-amber-600 text-white rounded-lg font-medium cursor-pointer hover:bg-amber-500 transition-colors animate-pulse shadow-md hover:shadow-lg dark:bg-sky-600 dark:hover:bg-sky-400"
               >
                 Limpiar favoritos
               </button>
             </div>
 
-            {/* Grid de productos */}
+            {/* Grid paginado */}
             <div
               className="
                 grid 
@@ -76,13 +111,31 @@ export default function LovedProductsPage() {
                 gap-4 md:gap-6
               "
             >
-              {favorites.map((fav) => (
+              {paginatedFavorites.map((fav) => (
                 <ProductCard key={fav.id} product={fav.product} />
               ))}
             </div>
+
+            {/* Paginador + contador */}
+            {favorites.length > pageSize && (
+              <>
+                <Pagination
+                  page={safePage}
+                  pageCount={pageCount}
+                  onPageChange={(newPage) => {
+                    setPage(newPage);
+                    updateUrl(newPage);
+                  }}
+                />
+                <p className="text-sm text-gray-500 w-full text-center mt-2">
+                  Página {safePage} de {pageCount} (Total: {favorites.length})
+                </p>
+              </>
+            )}
           </>
         )}
       </div>
     </ProtectedRoute>
   );
 }
+

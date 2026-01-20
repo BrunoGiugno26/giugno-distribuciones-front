@@ -1,13 +1,14 @@
 "use client";
 
 import { useGetProductsByType } from "@/api/getProductsByType";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import FilterBrand from "../../category/components/filter-brand";
 import ProductCard from "../../category/components/product-card";
 import SkeletonProductsGrid from "./components/SkeletonProductsGrid";
 import PriceFilter from "./components/PriceFilter";
 import { toast } from "sonner";
+import Pagination from "@/components/pagination/Pagination";
 
 const tipoMap: Record<string, string> = {
   shampoo: "Shampoo",
@@ -25,21 +26,58 @@ const tipoMap: Record<string, string> = {
 
 export default function ProductTypePage() {
   const { tipoProducto } = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const cleanTypeProduct = Array.isArray(tipoProducto)
     ? tipoProducto[0]
-    : tipoProducto ?? "";
+    : (tipoProducto ?? "");
   const tipoProductoReal = tipoMap[cleanTypeProduct] ?? cleanTypeProduct;
 
-  const [filterBrand, setFilterBrand] = useState("");
-  const [priceRange, setPriceRange] = useState<{ min?: number; max?: number }>(
-    {}
-  );
+  //Inicializacion de estados desde URL
 
-  const [page, setPage] = useState(1);
-  const pageSize = 12;
+  const initialBrand = searchParams.get("brand") ?? "";
+  const initialMin = searchParams.get("min");
+  const initialMax = searchParams.get("max");
+  const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
+
+  const [filterBrand, setFilterBrand] = useState(initialBrand);
+  const [priceRange, setPriceRange] = useState<{ min?: number; max?: number }>({
+    min: initialMin ? Number(initialMin) : undefined,
+    max: initialMax ? Number(initialMax) : undefined,
+  });
+
+  const [page, setPage] = useState(initialPage);
+  const pageSize = 4;
+
+  const updateUrl = (params: {
+    brand?: string;
+    min?: number;
+    max?: number;
+    page?: number;
+  }) => {
+    const query = new URLSearchParams();
+
+    if (params.brand && params.brand.trim() !== "")
+      query.set("brand", params.brand);
+    if (params.min !== undefined) query.set("min", String(params.min));
+    if (params.max !== undefined) query.set("max", String(params.max));
+    if (params.page && params.page > 1) query.set("page", String(params.page));
+
+    const qs = query.toString();
+    router.push(qs ? `?${qs}` : "?");
+  };
 
   useEffect(() => {
-    if (page !== 1) setPage(1);
+    if (page !== 1) {
+      setPage(1);
+      updateUrl({
+        brand: filterBrand,
+        min: priceRange.min,
+        max: priceRange.max,
+        page: 1,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterBrand, priceRange]);
 
@@ -56,7 +94,7 @@ export default function ProductTypePage() {
       precioMax: priceRange.max,
     },
     page,
-    pageSize
+    pageSize,
   );
 
   const filtrosActivos =
@@ -66,15 +104,17 @@ export default function ProductTypePage() {
 
   const handleApplyPrice = (range: { min?: number; max?: number }) => {
     setPriceRange(range);
-    const minTxt = range.min !== undefined ? `$${range.min}` : "mínimo";
-    const maxTxt = range.max !== undefined ? `$${range.max}` : "máximo";
+    setPage(1);
+    updateUrl({ brand: filterBrand, min: range.min, max: range.max, page: 1 });
     toast.success("Filtro de precio aplicado", {
-      description: `Rango: ${minTxt} - ${maxTxt}`,
+      description: `Rango: ${range.min ?? "mínimo"} - ${range.max ?? "máximo"}`,
     });
   };
 
   const handleBrandChange = (brand: string) => {
     setFilterBrand(brand);
+    setPage(1);
+    updateUrl({ brand, min: priceRange.min, max: priceRange.max, page: 1 });
     toast.success("Filtro de marca aplicado", {
       description: brand ? `Marca: ${brand}` : "Todas las marcas",
     });
@@ -83,15 +123,12 @@ export default function ProductTypePage() {
   const handleClearFilters = () => {
     setFilterBrand("");
     setPriceRange({});
+    setPage(1);
+    updateUrl({ page: 1 });
     toast.info("Filtros quitados", {
       description: "Se muestran todos los productos nuevamente.",
     });
   };
-
-  const goPrev = () => setPage((p) => Math.max(1, p - 1));
-  const goNext = () =>
-    setPage((p) => (meta ? Math.min(meta.pageCount, p + 1) : p));
-  const goTo = (num: number) => setPage(num);
 
   if (loading) {
     return (
@@ -200,42 +237,24 @@ export default function ProductTypePage() {
 
           {/* Paginado */}
           {meta && meta.pageCount > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
-              <button
-                disabled={page === 1}
-                onClick={goPrev}
-                className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
-              >
-                ←
-              </button>
-
-              {Array.from({ length: meta.pageCount }, (_, i) => i + 1).map(
-                (num) => (
-                  <button
-                    key={num}
-                    onClick={() => goTo(num)}
-                    className={`px-3 py-1 rounded ${
-                      page === num
-                        ? "bg-amber-500 text-black dark:bg-sky-600 dark:text-white"
-                        : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
-                    }`}
-                  >
-                    {num}
-                  </button>
-                )
-              )}
-
-              <button
-                disabled={page === meta.pageCount}
-                onClick={goNext}
-                className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
-              >
-                →
-              </button>
-              <p className="text-sm text-gray-500 w-full text-center mt-2">
-                Página {meta.page} de {meta.pageCount} (Total: {meta.total})
-              </p>
-            </div>
+          <>
+          <Pagination
+          page={page}
+          pageCount={meta.pageCount}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            updateUrl({
+              brand: filterBrand,
+              min: priceRange.min,
+              max: priceRange.max,
+              page: newPage,
+            });
+          }}
+          />
+          <p className="text-sm text-gray-500 w-full text-center mt-2">
+            Página {meta.page} de {meta.pageCount} (Total: {meta.total})
+          </p>
+          </>
           )}
         </section>
       </div>

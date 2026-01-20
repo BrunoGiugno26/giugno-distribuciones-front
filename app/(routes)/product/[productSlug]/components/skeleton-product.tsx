@@ -19,11 +19,15 @@ const SkeletonProduct = () => {
             <Skeleton className="h-4 w-full bg-gray-700/50" />
           </div>
           <div className="flex items-center space-x-4 pt-4">
-            <Skeleton className="h-10 w-24 bg-gray-700/70" />
-            <Skeleton className="h-10 w-24 bg-gray-700/70" />
+            <Skeleton className="h-10 w-24 bg-sky-600" />
+            <Skeleton className="h-12 w-12 bg-sky-200" />
+            <Skeleton className="h-10 w-16 bg-gray-700/70" />
+            <Skeleton className="h-10 w-40 bg-sky-600" />
           </div>
-          <div className="pt-4">
-            <Skeleton className="h-12 w-full max-w-xs rounded-full bg-amber-600/80 dark:bg-sky-600/80" />
+          <div className="flex items-center space-x-4 pt-4">
+            <Skeleton className="h-12 w-full max-w-xs rounded-full bg-gray-600/80 dark:bg-gray-600/80" />
+            <Skeleton className="h-12 w-full max-w-xs rounded-full bg-green-500 dark:bg-green-500" />
+            <Skeleton className="h-12 w-full max-w-xs rounded-full bg-sky-600 dark:bg-sky-600" />
           </div>
         </div>
       </div>
