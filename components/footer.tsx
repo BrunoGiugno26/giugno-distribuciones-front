@@ -8,18 +8,8 @@ const dataFooter = [
     link: "#",
   },
   {
-    id: 2,
-    name: "Productos",
-    link: "#",
-  },
-  {
     id: 3,
     name: "Mi Cuenta",
-    link: "#",
-  },
-  {
-    id: 4,
-    name: "Politica de privacidad",
     link: "#",
   },
 ];

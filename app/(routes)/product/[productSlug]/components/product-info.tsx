@@ -195,7 +195,10 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         <span className="text-3xl font-semibold text-amber-600 dark:text-sky-400">
           ${attributes.price + (selectedVariant?.attributes.priceDelta ?? 0)}{" "}
         </span>
-        <FavoriteButton product={product} /> {/* Input cantidad + botón */}
+
+        {variants.length === 0 && <FavoriteButton product={product} /> }
+
+         {/* Input cantidad + botón */}
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -206,7 +209,6 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
               const digitsOnly = raw.replace(/\D/g, "");
               const cleaned = digitsOnly.replace(/^0+/, "");
               let parsed = cleaned === "" ? 0 : parseInt(cleaned, 10);
-
               if (parsed > 100) parsed = 100;
               setQuantity(parsed);
             }}

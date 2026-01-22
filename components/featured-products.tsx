@@ -41,6 +41,10 @@ const FeaturedProducts = () => {
               const { slug, images, productName, tipoProducto, tipoCabello } =
                 attributes;
 
+              const variantCount = Array.isArray(attributes.variants?.data)
+                ? attributes.variants?.data.length
+                : 0;
+              const hasVariants = variantCount > 0;
               return (
                 <CarouselItem
                   key={id}
@@ -86,9 +90,11 @@ const FeaturedProducts = () => {
                           </div>
 
                           {/* Favorito */}
-                          <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                            <FavoriteButton product={product} />
-                          </div>
+                          {!hasVariants && (
+                            <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                              <FavoriteButton product={product} />
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -122,4 +128,3 @@ const FeaturedProducts = () => {
 };
 
 export default FeaturedProducts;
-

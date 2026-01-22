@@ -27,7 +27,7 @@ export default function LovedProductsPage() {
   // 📍 Estado inicial desde URL
   const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
   const [page, setPage] = useState(initialPage);
-  const pageSize = 5;
+  const pageSize = 6;
 
   const updateUrl = useCallback((newPage: number) => {
     const query = new URLSearchParams();

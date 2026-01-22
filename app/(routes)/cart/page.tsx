@@ -6,6 +6,9 @@ import { useCartStore } from "@/store/cart-store";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { useState, useMemo } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Pagination from "@/components/pagination/Pagination";
 
 const MAX_INPUT = 100;
 
@@ -24,11 +27,12 @@ export default function CartPage() {
   const removeItemBackend = useCartStore((s) => s.removeItemBackend);
   const clearCart = useCartStore((s) => s.clearCart);
   const { user } = useUser();
+  const router = useRouter();
 
   const distinctItems = items.length;
   const totalUnits = useMemo(
     () => items.reduce((acc, item) => acc + item.quantity, 0),
-    [items]
+    [items],
   );
 
   // Inicializamos cantidades locales directamente desde items
@@ -40,10 +44,21 @@ export default function CartPage() {
     return initial;
   });
 
+  const [page,setPage] = useState(1);
+  const itemsPerPage = 5
+  const pageCount = Math.max(1,Math.ceil(items.length / itemsPerPage));
+  const safePage = Math.max(1, Math.min(page,pageCount));
+
+  const paginatedItems = useMemo(() => {
+    const start = (safePage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return items.slice(start,end);
+  }, [items, safePage, itemsPerPage])
+
   const handleQuantityChange = (
     cartItemId: number,
     newQuantity: number,
-    stock: number
+    stock: number,
   ) => {
     const currentItem = items.find((i) => i.id === cartItemId);
     if (!currentItem) return;
@@ -80,84 +95,108 @@ export default function CartPage() {
   return (
     <ProtectedRoute>
       <div className="max-w-4xl mx-auto p-4 sm:p-8 space-y-6">
-        <h1 className="text-2xl sm:text-3xl font-extrabold mb-10">
-          Tu carrito
-        </h1>
-
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+            <button
+            onClick={() => router.push("/")}
+            className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 self-start"
+            >
+            ← Volver al inicio
+            </button>
+          <h1 className="text-2xl mt-8 sm:text-3xl font-extrabold flex-1 text-center sm:mt-1">
+            Tu carrito
+          </h1>
+        </div>
         {items.length === 0 ? (
           <p className="text-gray-600 dark:text-gray-300">
             Tu carrito está vacío.
           </p>
         ) : (
           <>
-            <div className="space-y-4">
-              {items.map((item) => {
+            <div className="space-y-6">
+              {paginatedItems.map((item) => {
                 const { product, variant } = item;
                 const { attributes } = product;
                 const imageUrl = attributes.images?.data?.[0]?.attributes?.url;
                 const stock = variant
                   ? variant.attributes.stock
-                  : attributes.stock ?? 0;
-
+                  : (attributes.stock ?? 0);
                 const currentLocal = localQuantities[item.id] ?? item.quantity;
-                const remaining = Math.max(stock - currentLocal, 0);
+                const remaining = Math.max(stock - item.quantity, 0);
                 const unitPrice =
                   attributes.price + (variant?.attributes.priceDelta ?? 0);
-
                 return (
                   <div
                     key={item.id}
-                    className="flex gap-4 items-center border-b pb-4"
+                    className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-4 items-start border-b pb-4 w-full"
                   >
                     {imageUrl && (
-                      <div className="w-20 h-20 relative rounded-md overflow-hidden bg-gray-100">
-                        <img
-                          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${imageUrl}`}
-                          alt={attributes.productName}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                      <Link href={`/product/${attributes.slug}`}>
+                        
+                        <div className="w-18 h-20 sm:w-20 sm:h-20 relative rounded-md overflow-hidden bg-gray-100 cursor-pointer">
+                          
+                          <img
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${imageUrl}`}
+                            alt={attributes.productName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </Link>
                     )}
-
-                    <div className="flex-1">
-                      <h2 className="font-semibold">
-                        {attributes.productName}
-                      </h2>
+                    {/* Contenido */}
+                    <div className="flex-1 min-w-0 wrap-break-word">
+                     
+                      <Link href={`/product/${attributes.slug}`}>
+                      
+                        <h2 className="font-semibold cursor-pointer hover:text-amber-600 dark:hover:text-sky-400">
+                         
+                          {attributes.productName}
+                        </h2>
+                      </Link>
                       <p className="text-sm text-gray-700 dark:text-gray-300">
+                        
                         Marca: {attributes.marca}
                       </p>
-
                       {variant && (
                         <p className="text-sm text-gray-700 dark:text-gray-500">
-                          Variante:{" "}
+                          
+                          Variante:
                           <span className="font-medium">
                             {variant.attributes.code}
                           </span>
                         </p>
                       )}
-
-                      <p className="text-sm text-gray-700 dark:text-gray-500">
-                        Stock restante:{" "}
-                        <span
-                          className={
-                            remaining > 0
-                              ? "text-gray-600"
-                              : "text-red-600 font-semibold"
-                          }
-                        >
-                          {remaining > 0 ? remaining : "Sin stock"}
-                        </span>
+                      {/* Badge */}
+                      <span className="inline-block px-2 py-0.5 text-xs rounded-full text-white bg-amber-400 dark:bg-sky-400 mt-1">
+                        
+                        Ya agregaste {item.quantity} unidades de {stock} disponibles
+                      </span>
+                      {/* Stock restante */}
+                      <p className="text-sm mt-1 text-gray-700 dark:text-gray-500">
+                       
+                        {remaining === 0 ? (
+                          <span className="text-amber-600 dark:text-sky-600 font-semibold">
+                           
+                            Stock completo en tu carrito
+                          </span>
+                        ) : (
+                          <span className="text-gray-600">
+                            
+                            Unidades disponibles: {remaining}
+                          </span>
+                        )}
                       </p>
-
                       {remaining <= 3 && remaining > 0 && (
                         <p className="text-sm text-red-500 font-medium">
-                          ¡Quedan solo {remaining} unidades disponibles!
+                          
+                          ¡Quedan solo {remaining} unidades disponibles!{" "}
                         </p>
                       )}
-
-                      {/* Cantidad editable + botón actualizar */}
+                      {/* Cantidad + actualizar */}
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="text-sm text-gray-700 dark:text-gray-500">Cantidad:</span>
+                        
+                        <span className="text-sm text-gray-700 dark:text-gray-500">
+                          Cantidad:
+                        </span>
                         <input
                           type="text"
                           inputMode="numeric"
@@ -165,7 +204,7 @@ export default function CartPage() {
                           onChange={(e) => {
                             const parsed = normalizeQuantity(
                               e.target.value,
-                              MAX_INPUT
+                              MAX_INPUT,
                             );
                             setLocalQuantities((q) => ({
                               ...q,
@@ -180,20 +219,19 @@ export default function CartPage() {
                           }
                           className="px-2 py-1 text-sm cursor-pointer text-white bg-amber-600 rounded hover:bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-500"
                         >
+                          
                           Actualizar
                         </button>
                       </div>
                     </div>
-
-                    {/* Precio y eliminar */}
-                    <div className="text-right space-y-2">
-                      <p className="font-semibold">
+                    {/* Acciones (precio + eliminar) */}
+                    <div className="space-y-2 sm:min-w-20">
+                      
+                      <p className="text-lg font-medium">
                         ${unitPrice * item.quantity}
                       </p>
                       <button
-                        className="flex items-center px-2 py-0.5 space-x-2 text-xs font-medium transition duration-200 rounded-lg shadow-md cursor-pointer
-                        bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200
-                        dark:bg-sky-700 dark:text-white dark:border-sky-600 dark:hover:bg-sky-600 dark:hover:border-sky-500"
+                        className="flex items-center px-2 py-0.5 space-x-2 text-xs font-medium transition duration-200 rounded-lg shadow-md cursor-pointer bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 dark:bg-sky-700 dark:text-white dark:border-sky-600 dark:hover:bg-sky-600 dark:hover:border-sky-500"
                         onClick={() => handleRemove(item.id)}
                       >
                         Eliminar
@@ -204,9 +242,12 @@ export default function CartPage() {
               })}
             </div>
 
-            {/* Totales */}
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="space-y-2">
+            <Pagination page={safePage} pageCount={pageCount} onPageChange={(newPage) => setPage(newPage)}/>
+            {/* Totales + acciones finales */}
+            <div className="flex flex-col sm:flex-row justify-between items-center pt-6 border-t gap-4">
+              
+              <div className="space-y-2 text-center sm:text-left">
+                
                 <p className="text-sm text-gray-500">
                   Productos Totales: {distinctItems}
                 </p>
@@ -215,7 +256,6 @@ export default function CartPage() {
                 </p>
                 <p className="text-lg font-semibold">Total: ${totalPrice}</p>
               </div>
-
               <div className="flex gap-3">
                 <button
                   className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"

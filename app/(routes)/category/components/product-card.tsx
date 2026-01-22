@@ -17,9 +17,10 @@ import { useCartStore } from "@/store/cart-store";
 
 type ProductCardProps = {
   product: ProductType;
+  forceHasVariants?: boolean;
 };
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
 
@@ -30,17 +31,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
     router.push(`/product/${product.attributes.slug}`);
   };
 
-  const variantCount = product.attributes.variants?.data?.length ?? 0;
-  const hasVariants = variantCount > 0;
+  const hasVariants =
+    forceHasVariants ?? (product.attributes.variants?.data?.length ?? 0) > 0;
 
   const stockGeneral = product.attributes.stock ?? 0;
 
-  const cartQuantity = items.find(
-    (i) => i.product.id === product.id && !i.variant
-  ) ?.quantity ?? 0;
+  const cartQuantity =
+    items.find((i) => i.product.id === product.id && !i.variant)?.quantity ?? 0;
 
   const remaining = Math.max(stockGeneral - cartQuantity, 0);
-  const isLowStock = remaining > 0 && remaining <=3
+  const isLowStock = remaining > 0 && remaining <= 3;
 
   return (
     <Link
@@ -52,16 +52,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {product.attributes.tipoProducto}
         </p>
         {product.attributes.origin && (
-          <p
-            className="px-2 py-1 text-[10px] font-bold text-black bg-amber-300
-          dark:bg-sky-500 rounded-full w-fit uppercase tracking-wider shadow-sm"
-          >
+          <p className="px-2 py-1 text-[10px] font-bold text-black bg-amber-300 dark:bg-sky-500 rounded-full w-fit uppercase tracking-wider shadow-sm">
             {product.attributes.origin}
           </p>
         )}
         {hasVariants && (
           <p className="px-2 py-1 text[10px] font-bold text-white bg-blue-600 rounded-full w-fit uppercase tracking-wider shadow-sm">
-            Producto con variantes
+            Tiene variantes
           </p>
         )}
       </div>
@@ -77,10 +74,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     alt={product.attributes.productName}
                     className="object-cover w-full h-full p-0 transition-transform duration-500 group-hover:scale-110"
                   />
-                  <div
-                    className="absolute w-full px-6 bottom-5 flex justify-center gap-x-3 
-                  opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200"
-                  >
+                  <div className="absolute w-full px-6 bottom-5 flex justify-center gap-x-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200">
                     <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                       <IconButton
                         onClick={handleExpandClick as () => void}
@@ -93,9 +87,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
                       />
                     </div>
 
-                    <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                      <FavoriteButton product={product} />
-                    </div>
+                    {/* ❤️ Solo mostrar favoritos si NO tiene variantes */}
+                    {!hasVariants && (
+                      <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                        <FavoriteButton product={product} />
+                      </div>
+                    )}
+
+                    {/* 🛒 Solo mostrar carrito si NO tiene variantes */}
                     {!hasVariants && (
                       <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                         <AddToCartButton product={product} />
@@ -140,3 +139,4 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 export default ProductCard;
+

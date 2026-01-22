@@ -48,7 +48,7 @@ export default function ProductTypePage() {
   });
 
   const [page, setPage] = useState(initialPage);
-  const pageSize = 4;
+  const pageSize = 12;
 
   const updateUrl = (params: {
     brand?: string;

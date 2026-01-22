@@ -77,7 +77,7 @@ const ShareButtons = ({ className, label, overrideUrl }:ShareButtonsProps) => {
                 </button>
                 <button
                 onClick={webShare}
-                className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer bg-blue-500 text-white hover:bg-blue-600 transition"
+                className="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer bg-amber-600 hover:bg-amber-500 dark:bg-sky-600 text-white dark:hover:bg-sky-500 transition"
                 >
                     <Share2 className="w-4 h-4"/>
                     Compartir
