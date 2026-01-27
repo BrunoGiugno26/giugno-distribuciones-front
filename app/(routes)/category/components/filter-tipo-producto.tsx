@@ -9,12 +9,13 @@ type AttributeField = {
 
 type FilterTipoProductoProps = {
     setFilterTipoProducto:(type:string) => void
+    value: string;
 }
 
 const PRODUCT_TYPE_FIELD_NAME = "tipoProducto";
 
 const FilterTipoProducto = (props:FilterTipoProductoProps) =>{
-    const { setFilterTipoProducto } = props;
+    const { setFilterTipoProducto,value } = props;
     const { result, loading }: FilterTypes = useGetProductField();
 
     const typeAttributes = (result?.schema?.attributes as Record<string,AttributeField>)?.[PRODUCT_TYPE_FIELD_NAME]
@@ -25,7 +26,7 @@ const FilterTipoProducto = (props:FilterTipoProductoProps) =>{
             <p className="mb-3 font-bold">Tipo de Producto</p>
             {loading && result === null && <p>Cargando Tipos...</p>}
 
-            <RadioGroup onValueChange={(value) => setFilterTipoProducto(value)}>
+            <RadioGroup value={value} onValueChange={(val) => setFilterTipoProducto(val)}>
                 <div key="all-type" className="flex items-center space-x-2">
                     <RadioGroupItem value="" id="all-types"/>
                     <Label htmlFor="all-type" className="font-bold">Todos</Label>

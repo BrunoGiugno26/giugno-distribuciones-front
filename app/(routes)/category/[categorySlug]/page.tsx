@@ -78,6 +78,8 @@ export default function Page() {
         {/* Filtros */}
         <div className="w-full lg:w-64 shrink-0">
           <FiltersControlsCategory
+            brandValue={filterBrand}
+            tipoValue={filterTipoProducto}
             setFilterBrand={(brand) => {
               setFilterBrand(brand);
               setPage(1);
