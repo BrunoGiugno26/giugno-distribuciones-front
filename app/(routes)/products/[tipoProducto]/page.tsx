@@ -87,8 +87,8 @@ export default function ProductTypePage() {
     error,
     meta,
   } = useGetProductsByType(
-    tipoProductoReal,
     {
+      tipoProducto:tipoProductoReal,
       marca: filterBrand,
       precioMin: priceRange.min,
       precioMax: priceRange.max,

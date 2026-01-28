@@ -20,7 +20,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
 
   const variants = attributes.variants?.data ?? [];
   const [selectedVariant, setSelectedVariant] = useState<VariantType | null>(
-    variants.length > 0 ? variants[0] : null
+    variants.length > 0 ? variants[0] : null,
   );
 
   const [quantity, setQuantity] = useState(1);
@@ -28,8 +28,8 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   // Stock disponible (solo variante si existen variantes)
   const available =
     variants.length > 0
-      ? selectedVariant?.attributes.stock ?? 0
-      : attributes.stock ?? 0;
+      ? (selectedVariant?.attributes.stock ?? 0)
+      : (attributes.stock ?? 0);
 
   // Cantidad actual en el carrito para este producto+variante
   const cartQuantity = useMemo(() => {
@@ -39,7 +39,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           i.product.id === product.id &&
           (variants.length > 0 && selectedVariant
             ? i.variant?.id === selectedVariant.id
-            : !i.variant)
+            : !i.variant),
       )?.quantity ?? 0
     );
   }, [items, product.id, selectedVariant, variants.length]);
@@ -79,11 +79,13 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         product,
         quantity,
         user.id,
-        selectedVariant ?? undefined
+        selectedVariant ?? undefined,
       );
 
     toast.success("Producto añadido al carrito 🛒");
   };
+
+  const isPeluqueria = attributes.audience === "peluquerias";
 
   return (
     <div className="space-y-8">
@@ -115,7 +117,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
 
           <Listbox value={selectedVariant} onChange={setSelectedVariant}>
             <div className="relative">
-              <Listbox.Button className="w-full rounded-md border px-3 py-2 bg-amber-50 dark:bg-sky-950  font-semibold text-gray-900 dark:text-white text-left text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-sky-600">
+              <Listbox.Button className="w-full rounded-md border px-3 py-2 bg-amber-50 dark:bg-sky-950 font-semibold text-gray-900 dark:text-white text-left text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-sky-600">
                 {selectedVariant
                   ? `Tono ${selectedVariant.attributes.code}`
                   : "Seleccioná un tono..."}
@@ -190,47 +192,60 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           Ya tenés el máximo disponible en el carrito
         </p>
       )}
-      {/* Precio, favoritos y cantidad */}{" "}
+      {/* Precio, favoritos y cantidad */}
       <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
-        <span className="text-3xl font-semibold text-amber-600 dark:text-sky-400">
-          ${attributes.price + (selectedVariant?.attributes.priceDelta ?? 0)}{" "}
-        </span>
+        {!isPeluqueria ? (
+          <>
+            <span className="text-3xl font-semibold text-amber-600 dark:text-sky-400">
+              $
+              {attributes.price +
+                (selectedVariant?.attributes.priceDelta ?? 0)}{" "}
+            </span>
 
-        {variants.length === 0 && <FavoriteButton product={product} /> }
+            {variants.length === 0 && <FavoriteButton product={product} />}
 
-         {/* Input cantidad + botón */}
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            inputMode="numeric"
-            value={quantity}
-            onChange={(e) => {
-              const raw = e.target.value;
-              const digitsOnly = raw.replace(/\D/g, "");
-              const cleaned = digitsOnly.replace(/^0+/, "");
-              let parsed = cleaned === "" ? 0 : parseInt(cleaned, 10);
-              if (parsed > 100) parsed = 100;
-              setQuantity(parsed);
-            }}
-            className="w-16 px-2 py-1 border rounded text-center appearance-none"
-          />
+            {/* Input cantidad + botón */}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={quantity}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  const digitsOnly = raw.replace(/\D/g, "");
+                  const cleaned = digitsOnly.replace(/^0+/, "");
+                  let parsed = cleaned === "" ? 0 : parseInt(cleaned, 10);
+                  if (parsed > 100) parsed = 100;
+                  setQuantity(parsed);
+                }}
+                className="w-16 px-2 py-1 border rounded text-center appearance-none"
+              />
 
+              <button
+                onClick={handleAddToCart}
+                disabled={available <= 0 || variantRequired}
+                className="px-4 py-2 cursor-pointer bg-amber-600 dark:bg-sky-600 text-white rounded-lg hover:bg-amber-400 dark:hover:bg-sky-400 disabled:bg-gray-400"
+              >
+                Añadir al carrito
+              </button>
+            </div>
+          </>
+        ) : (
           <button
-            onClick={handleAddToCart}
-            disabled={available <= 0 || variantRequired}
-            className="px-4 py-2 cursor-pointer bg-amber-600 dark:bg-sky-600 text-white rounded-lg hover:bg-amber-400 dark:hover:bg-sky-400 disabled:bg-gray-400"
+            onClick={() =>
+              window.open(
+                `https://wa.me/549261XXXXXXX?text=Hola, quiero consultar por ${attributes.productName}`,
+                "_blank",
+              )
+            }
+            className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
           >
-            Añadir al carrito
+            Consultar por WhatsApp
           </button>
-        </div>
-      </div>
-
-      <ShareButtons
-      className="mt-4"
-      label="Compartir este producto"
-      />
+        )}{" "}
+      </div>{" "}
+      <ShareButtons className="mt-4" label="Compartir este producto" />{" "}
     </div>
   );
 };
-
 export default ProductInfo;

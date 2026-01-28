@@ -4,17 +4,22 @@ import { PaginationMeta } from "@/types/response";
 
 type Filters = {
   marca?: string;
+  tipoProducto?: string,
   precioMin?: number;
   precioMax?: number;
+  audience?: string;
 };
 
 export function useGetProductsByType(
-  tipoProducto: string,
   filters: Filters,
   page: number = 1,
   pageSize: number = 12
 ) {
   const filterArray: string[] = [];
+
+  if (filters.tipoProducto) {
+    filterArray.push(`filters[tipoProducto][$eq]=${encodeURIComponent (filters.tipoProducto)}`);
+  }
 
   if (filters.marca) {
     filterArray.push(`filters[marca][$eq]=${encodeURIComponent(filters.marca)}`);
@@ -28,10 +33,13 @@ export function useGetProductsByType(
     filterArray.push(`filters[price][$lte]=${filters.precioMax}`);
   }
 
-  const additionalFilters =
-    filterArray.length > 0 ? `&${filterArray.join("&")}` : "";
+  if (filters.audience) {
+    filterArray.push(`filters[audience][$eq]=${filters.audience}`);
+  }
 
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=*&filters[tipoProducto][$eq]=${tipoProducto}${additionalFilters}&pagination[page]=${page}&pagination[pageSize]=${pageSize}&sort=createdAt:desc`;
+  const filterString = filterArray.length > 0 ? `&${filterArray.join("&")}` : "";
+
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=*${filterString}&pagination[page]=${page}&pagination[pageSize]=${pageSize}&sort=createdAt:desc`;
 
   const [result, setResult] = useState<ProductType[] | null>(null);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
@@ -60,4 +68,5 @@ export function useGetProductsByType(
 
   return { loading, result, error, meta };
 }
+
 

@@ -17,11 +17,21 @@ export type ProductType = {
         active: boolean;
         isFeatured: boolean;
         tipoProducto: string;
+        tipoProductoNuevo?: {
+            data: {
+                id: number;
+                attributes: {
+                    nombre:string;
+                    slug:string;
+                };
+            } | null
+        }
         tipoCabello: string;
         origin: string;
         price: number;
         marca: string;
         stock: number;
+        audience: string;
         images: {
             data: {
                 id: number,

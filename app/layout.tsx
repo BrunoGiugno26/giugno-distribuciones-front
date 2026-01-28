@@ -10,6 +10,7 @@ import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import SyncWrapper from "@/components/sync-wrapper";
+import FloatingWhatsAppButton from "./(routes)/peluquerias/reventa/components/FloatingWhatsAppButton";
 
 const ubuntu = Ubuntu({
   variable: "--font-geist-sans",
@@ -85,6 +86,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navbar />
+            <FloatingWhatsAppButton/>
             {children}
             <Footer />
             <Toaster richColors position="top-right" visibleToasts={1} />

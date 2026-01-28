@@ -13,19 +13,34 @@ type PaginationMeta = {
   total: number;
 };
 
+const useNewTipoSystem = (slug:string) =>{
+  return ["accesorios", "accesorios-y-herramientas-profesionales","muebles","reventa","particular"].includes(slug);
+};
+
 export function useGetCategoryProduct(
   slug: string | string[],
   filters: Filters,
   page: number = 1,
   pageSize: number = 12
 ) {
+  const cleanSlug = Array.isArray(slug) ? slug[0] : slug;
+  const isNewSystem = useNewTipoSystem(cleanSlug)
   const filterArray: string[] = [];
 
   if (filters.tipoProducto) {
     const encodedType = encodeURIComponent(filters.tipoProducto);
-    filterArray.push(`filters[tipoProducto][$eq]=${encodedType}`);
-  }
+   
+    if (isNewSystem) {
+      filterArray.push(`filters[tipoProductoNuevo][slug][$eq]=${encodedType}`
 
+      )
+    } else {
+      filterArray.push(
+        `filters[tipoProducto][$eq]=${encodedType}`
+      )
+    }
+  }
+    
   if (filters.marca) {
     const encodedMarca = encodeURIComponent(filters.marca);
     filterArray.push(`filters[marca][$eq]=${encodedMarca}`);
@@ -33,8 +48,6 @@ export function useGetCategoryProduct(
 
   const additionalFilters =
     filterArray.length > 0 ? `&${filterArray.join("&")}` : "";
-
-  const cleanSlug = Array.isArray(slug) ? slug[0] : slug;
 
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=*&filters[category][slug][$eq]=${cleanSlug}${additionalFilters}&pagination[page]=${page}&pagination[pageSize]=${pageSize}&sort=createdAt:desc`;
 

@@ -32,7 +32,7 @@ const ProfileSelector = () => {
             </Link>
 
             <Link
-              href="/salones"
+              href="/peluquerias/reventa"
               className="bg-card border border-border rounded-xl p-6 hover:shadow-lg hover:scale-[1.02] transition-transform text-left"
             >
               <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">

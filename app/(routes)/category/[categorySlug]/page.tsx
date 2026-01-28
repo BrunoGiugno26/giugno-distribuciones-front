@@ -9,10 +9,18 @@ import { ProductType } from "@/types/product";
 import { useEffect, useState } from "react";
 import Pagination from "@/components/pagination/Pagination";
 
+// Detecta si la categoría usa el sistema nuevo
+const useNewTipoSystem = (slug: string) => {
+  return ["accesorios", "accesorios-y-herramientas-profesionales", "muebles", "reventa", "particular"].includes(slug);
+};
+
 export default function Page() {
   const { categorySlug } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const cleanSlug = categorySlug as string;
+  const isNewSystem = useNewTipoSystem(cleanSlug);
 
   const initialBrand = searchParams.get("brand") ?? "";
   const initialTipo = searchParams.get("tipoProducto") ?? "";
@@ -31,15 +39,18 @@ export default function Page() {
 
     if (params.brand && params.brand.trim() !== "")
       query.set("brand", params.brand);
+
     if (params.tipoProducto && params.tipoProducto.trim() !== "")
       query.set("tipoProducto", params.tipoProducto);
-    if (params.page && params.page > 1) query.set("page", String(params.page));
+
+    if (params.page && params.page > 1)
+      query.set("page", String(params.page));
 
     const qs = query.toString();
     router.push(qs ? `?${qs}` : "?");
   };
 
-  // ✅ Resetear página solo si no está en 1
+  // Resetear página cuando cambian filtros
   useEffect(() => {
     if (page !== 1) {
       setPage(1);
@@ -53,10 +64,10 @@ export default function Page() {
   }, [filterBrand, filterTipoProducto]);
 
   const { result, loading, meta } = useGetCategoryProduct(
-    categorySlug as string,
+    cleanSlug,
     { marca: filterBrand, tipoProducto: filterTipoProducto },
     page,
-    12,
+    12
   );
 
   const products = Array.isArray(result) ? result : [];
@@ -80,15 +91,25 @@ export default function Page() {
           <FiltersControlsCategory
             brandValue={filterBrand}
             tipoValue={filterTipoProducto}
+            isNewSystem={isNewSystem}
+            categorySlug={cleanSlug}
             setFilterBrand={(brand) => {
               setFilterBrand(brand);
               setPage(1);
-              updateUrl({ brand, tipoProducto: filterTipoProducto, page: 1 });
+              updateUrl({
+                brand,
+                tipoProducto: filterTipoProducto,
+                page: 1,
+              });
             }}
             setFilterTipoProducto={(tipo) => {
               setFilterTipoProducto(tipo);
               setPage(1);
-              updateUrl({ brand: filterBrand, tipoProducto: tipo, page: 1 });
+              updateUrl({
+                brand: filterBrand,
+                tipoProducto: tipo,
+                page: 1,
+              });
             }}
           />
         </div>
@@ -97,9 +118,11 @@ export default function Page() {
         <div className="flex-1">
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {loading && <SkeletonSchema grid={3} />}
+
             {products.map((product: ProductType) => (
               <ProductCard key={product.id} product={product} />
             ))}
+
             {products.length === 0 && !loading && (
               <div className="col-span-full text-center text-gray-500 py-10">
                 No se encontraron productos con este filtro.
@@ -127,3 +150,4 @@ export default function Page() {
     </div>
   );
 }
+
