@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useGetProductBySlug } from "@/api/getProductBySlug";
 import SkeletonProduct from "./components/skeleton-product";
 import CarouselProduct from "./components/carousel-product";
@@ -9,8 +9,11 @@ import ProductInfo from "./components/product-info";
 
 export default function Page() {
   const { productSlug } = useParams();
-  const { result, loading, error } = useGetProductBySlug(productSlug ?? "");
+  const searchParams = useSearchParams();
 
+  const isReventaView = searchParams.get("reventa") === "true";
+
+  const { result, loading, error } = useGetProductBySlug(productSlug ?? "");
   const [activeIndex, setActiveIndex] = useState(0);
 
   if (loading || result === null) {
@@ -29,7 +32,9 @@ export default function Page() {
             setActiveIndex={setActiveIndex}
           />
         </div>
-        <ProductInfo product={activeProduct} />
+        <ProductInfo product={activeProduct}
+        isReventaView={isReventaView}
+        />
       </div>
 
       {error && (

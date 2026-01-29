@@ -16,6 +16,7 @@ export type ProductType = {
         description: string;
         active: boolean;
         isFeatured: boolean;
+        esReventa?: boolean;
         tipoProducto: string;
         tipoProductoNuevo?: {
             data: {

@@ -18,9 +18,16 @@ import { useCartStore } from "@/store/cart-store";
 type ProductCardProps = {
   product: ProductType;
   forceHasVariants?: boolean;
+  showPrice?: boolean;
+  isReventaView?: boolean;
 };
 
-const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
+const ProductCard = ({
+  product,
+  forceHasVariants,
+  showPrice = true,
+  isReventaView = false,
+}: ProductCardProps) => {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const [showPopup, setShowPopup] = useState(false);
@@ -29,7 +36,12 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
 
   const handleExpandClick = (e: ButtonClickEvent) => {
     e.preventDefault();
-    router.push(`/product/${product.attributes.slug}`);
+
+    router.push(
+      isReventaView
+        ? `/product/${product.attributes.slug}?reventa=true`
+        : `/product/${product.attributes.slug}`
+    )
   };
 
   const hasVariants =
@@ -43,9 +55,6 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
   const remaining = Math.max(stockGeneral - cartQuantity, 0);
   const isLowStock = remaining > 0 && remaining <= 3;
 
-  const isPeluqueria =
-    product.attributes.audience === "peluquerias"
-
   // 🔑 Cerrar popup con tecla ESC
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -55,10 +64,17 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
+  const productHref = isReventaView
+    ? {
+        pathname: `/product/${product.attributes.slug}`,
+        query: { reventa: "true" },
+      }
+    : `/product/${product.attributes.slug}`;
+
   return (
     <div className="relative">
       <Link
-        href={`/product/${product.attributes.slug}`}
+        href={productHref}
         className="relative flex flex-col justify-between h-full p-3 transition-all duration-200 rounded-xl border border-transparent hover:border-slate-200 hover:shadow-xl bg-white dark:bg-slate-900 dark:hover:border-slate-700 group/card"
       >
         <div className="absolute top-4 px-2 left-2 right-2 flex flex-wrap gap-2 items-start justify-between">
@@ -101,13 +117,13 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
                         />
                       </div>
 
-                      {!hasVariants && !isPeluqueria && (
+                      {!hasVariants && showPrice && (
                         <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                           <FavoriteButton product={product} />
                         </div>
                       )}
 
-                      {!hasVariants && !isPeluqueria && (
+                      {!hasVariants && showPrice && (
                         <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                           <AddToCartButton product={product} />
                         </div>
@@ -127,13 +143,11 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
             {product.attributes.productName}
           </p>
 
-          {!isPeluqueria && (
+          {showPrice ? (
             <p className="font-bold text-lg text-center text-amber-600 dark:text-sky-400">
               {formatPrice(product.attributes.price)}
             </p>
-          )}
-
-          {isPeluqueria && (
+          ) : (
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -146,7 +160,7 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
             </button>
           )}
 
-          {!isPeluqueria &&
+          {showPrice &&
             (hasVariants ? (
               <p className="text-sm text-center font-semibold text-amber-600 dark:text-sky-600">
                 Variantes disponibles - ver en el detalle
@@ -167,7 +181,7 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
       </Link>
 
       {/* Popup WhatsApp */}
-      {showPopup && (
+      {!showPrice && showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl text-center w-[90%] sm:max-w-sm">
             <h2 className="text-lg font-bold mb-2 text-green-600">
@@ -198,5 +212,3 @@ const ProductCard = ({ product, forceHasVariants }: ProductCardProps) => {
 };
 
 export default ProductCard;
-
-

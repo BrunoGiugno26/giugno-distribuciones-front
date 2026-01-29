@@ -137,6 +137,12 @@ const components: { title: string; href: string; description: string }[] = [
 
 const salon: { title: string; href: string; description: string }[] = [
   {
+    title: "Productos Profesionales",
+    href: "/salones/productos-profesionales",
+    description:
+      "Tinturas, Decolorantes, Aguas Oxigenadas y Shampoos y Enjuagues de 5Lt para tu salón.",
+  },
+  {
     title: "Productos de Reventa",
     href: "/peluquerias/reventa",
     description:
@@ -147,12 +153,6 @@ const salon: { title: string; href: string; description: string }[] = [
     href: "/salones/accesorios-pro",
     description:
       "Tijeras, secadores, capas y herramientas especializadas para el trabajo en salón.",
-  },
-  {
-    title: "Productos Profesionales",
-    href: "/salones/productos-profesionales",
-    description:
-      "Tinturas, Decolorantes, Aguas Oxigenadas y Shampoos y Enjuagues de 5Lt para tu salón.",
   },
   {
     title: "Muebles",

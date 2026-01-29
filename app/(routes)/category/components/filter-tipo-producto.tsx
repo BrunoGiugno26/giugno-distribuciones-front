@@ -35,36 +35,43 @@ const FilterTipoProducto = ({
 
   // SISTEMA NUEVO → traer tipos desde Strapi
   useEffect(() => {
-    if (!isNewSystem || !categorySlug) return;
-
+    if (!isNewSystem) return;
     const fetchTypes = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tipo-productos?populate=*&filters[categories][slug][$eq]=${categorySlug}`
-        );
+        const base = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tipo-productos?populate=*`;
+        const url = categorySlug
+          ? `${base}&filters[categories][slug][$eq]=${encodeURIComponent(categorySlug)}`
+          : base;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Error ${res.status}`);
         const json = await res.json();
         setNewTypes(json.data as TipoProductoItem[]);
       } catch (err) {
         console.error("Error cargando tipos nuevos", err);
+        setNewTypes([]);
       }
     };
-
     fetchTypes();
   }, [isNewSystem, categorySlug]);
 
   // SISTEMA VIEJO → ENUM
   const { result }: FilterTypes = useGetProductField();
-  const typeAttributes = (result?.schema?.attributes as Record<
-    string,
-    AttributeField
-  >)?.[PRODUCT_TYPE_FIELD_NAME];
+  const typeAttributes = (
+    result?.schema?.attributes as Record<string, AttributeField>
+  )?.[PRODUCT_TYPE_FIELD_NAME];
   const productTypes = typeAttributes?.enum;
 
-  console.log( "DEBUG → isNewSystem:", isNewSystem, "categorySlug:", categorySlug, "newTypes:", newTypes );
+  console.log(
+    "DEBUG → isNewSystem:",
+    isNewSystem,
+    "categorySlug:",
+    categorySlug,
+    "newTypes:",
+    newTypes,
+  );
 
   return (
     <div className="my-5">
-        
       <p className="mb-3 font-bold">Tipo de Producto</p>
 
       <RadioGroup value={value} onValueChange={setFilterTipoProducto}>
@@ -78,10 +85,13 @@ const FilterTipoProducto = ({
 
         {/* SISTEMA NUEVO */}
         {isNewSystem &&
-        Array.isArray(newTypes) &&
+          Array.isArray(newTypes) &&
           newTypes.map((t) => (
             <div key={t.id} className="flex items-center space-x-2">
-              <RadioGroupItem value={t.attributes.slug} id={t.attributes.slug} />
+              <RadioGroupItem
+                value={t.attributes.slug}
+                id={t.attributes.slug}
+              />
               <Label htmlFor={t.attributes.slug}>{t.attributes.nombre}</Label>
             </div>
           ))}

@@ -159,7 +159,7 @@ export default function CartPage() {
                       {variant && (
                         <p className="text-sm text-gray-700 dark:text-gray-500">
                           
-                          Variante:
+                          Variante:{" "}
                           <span className="font-medium">
                             {variant.attributes.code}
                           </span>

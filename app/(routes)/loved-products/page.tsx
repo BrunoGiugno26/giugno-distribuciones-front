@@ -75,7 +75,7 @@ useEffect(() => {
               Todavía no tienes productos favoritos.
             </p>
             <button
-              onClick={() => router.push("/category/peluquerias-y-perfumerias")}
+              onClick={() => router.push("/category/venta-minorista")}
               className="mt-6 px-5 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition dark:bg-sky-600 dark:hover:bg-sky-700"
             >
               Ver productos

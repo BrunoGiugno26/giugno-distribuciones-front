@@ -31,7 +31,7 @@ export function useGetCategoryProduct(
     const encodedType = encodeURIComponent(filters.tipoProducto);
    
     if (isNewSystem) {
-      filterArray.push(`filters[tipoProductoNuevo][slug][$eq]=${encodedType}`
+      filterArray.push(`filters[tipo_productos][slug][$eq]=${encodedType}`
 
       )
     } else {

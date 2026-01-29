@@ -1,10 +1,9 @@
 "use client";
-
-import { useGetProductsByType } from "@/api/getProductsByType";
 import { useEffect, useState } from "react";
 import ProductCard from "@/app/(routes)/category/components/product-card";
 import { useRouter, useSearchParams } from "next/navigation";
 import Pagination from "@/components/pagination/Pagination";
+import { useGetReventaProducts } from "@/api/useGetReventaProduct";
 
 type Props = {
   filterBrand: string;
@@ -17,21 +16,14 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
 
   const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
   const [page, setPage] = useState(initialPage);
-  const pageSize = 12;
-
-  const {
-    result: products,
-    loading,
-    error,
-    meta,
-  } = useGetProductsByType(
+  
+  const { result: products, loading, error , meta } = useGetReventaProducts(
     {
-      audience: "peluquerias",
-      marca: filterBrand || undefined,
-      tipoProducto: filterTipoProducto || undefined,
+      marca: filterBrand,
+      tipoProducto: filterTipoProducto,
     },
     page,
-    pageSize,
+    12
   );
 
   const updateUrl = (newPage: number) => {
@@ -53,7 +45,7 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
       {products && products.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
           {products?.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} showPrice ={false} isReventaView/>
           ))}
         </div>
       ) : (

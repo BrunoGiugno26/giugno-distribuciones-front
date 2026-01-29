@@ -19,7 +19,7 @@ const ProfileSelector = () => {
 
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-3">
             <Link
-              href="/category/peluquerias-y-perfumerias"
+              href="/category/venta-minorista"
               className="bg-card border border-border rounded-xl p-6 hover:shadow-lg hover:scale-[1.02] transition-transform text-left"
             >
               <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">

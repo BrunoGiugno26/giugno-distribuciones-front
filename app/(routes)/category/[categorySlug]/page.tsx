@@ -5,13 +5,19 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import FiltersControlsCategory from "../components/filters-controls-category";
 import SkeletonSchema from "@/components/ui/skeletonSchema";
 import ProductCard from "../components/product-card";
-import { ProductType } from "@/types/product";
 import { useEffect, useState } from "react";
 import Pagination from "@/components/pagination/Pagination";
+import { toast } from "sonner";
 
 // Detecta si la categoría usa el sistema nuevo
 const useNewTipoSystem = (slug: string) => {
-  return ["accesorios", "accesorios-y-herramientas-profesionales", "muebles", "reventa", "particular"].includes(slug);
+  return [
+    "accesorios",
+    "accesorios-y-herramientas-profesionales",
+    "muebles",
+    "reventa",
+    "particular",
+  ].includes(slug);
 };
 
 export default function Page() {
@@ -43,8 +49,7 @@ export default function Page() {
     if (params.tipoProducto && params.tipoProducto.trim() !== "")
       query.set("tipoProducto", params.tipoProducto);
 
-    if (params.page && params.page > 1)
-      query.set("page", String(params.page));
+    if (params.page && params.page > 1) query.set("page", String(params.page));
 
     const qs = query.toString();
     router.push(qs ? `?${qs}` : "?");
@@ -67,27 +72,39 @@ export default function Page() {
     cleanSlug,
     { marca: filterBrand, tipoProducto: filterTipoProducto },
     page,
-    12
+    12,
   );
 
   const products = Array.isArray(result) ? result : [];
 
+  const filtrosActivos = !!filterBrand || !!filterTipoProducto;
+
+  const handleClearFilters = () => {
+    setFilterBrand("");
+    setFilterTipoProducto("");
+    setPage(1);
+    updateUrl({ page: 1 });
+
+    toast.info("Filtros quitados", {
+      description: "Se muestran todos los productos nuevamente.",
+    });
+  };
+
   return (
-    <div className="max-w-7xl p-4 mx-auto sm:py-16 sm:px-12">
+    <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       {products.length > 0 && !loading && (
-        <h1 className="text-xl sm:text-3xl font-bold text-center mb-8 uppercase tracking-wider text-slate-900 dark:text-slate-100">
-          Categoría{" "}
-          <span className="text-amber-500 dark:text-sky-500 block sm:inline-block">
+        <section className="text-center">
+          <h1 className="text-4xl font-extrabold bg-linear-to-r from-sky-500 to-amber-500 bg-clip-text text-transparent uppercase tracking-wider">
             {products[0].attributes.category.data.attributes.categoryName}
-          </span>
-        </h1>
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Descubre nuestra selección de productos de esta categoría
+          </p>
+        </section>
       )}
-
       <Separator />
-
-      <div className="flex flex-col lg:flex-row mt-10 gap-8">
-        {/* Filtros */}
-        <div className="w-full lg:w-64 shrink-0">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <aside className="w-full lg:w-64 bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 space-y-6 max-h-[600px] overflow-y-auto">
           <FiltersControlsCategory
             brandValue={filterBrand}
             tipoValue={filterTipoProducto}
@@ -101,6 +118,10 @@ export default function Page() {
                 tipoProducto: filterTipoProducto,
                 page: 1,
               });
+
+              toast.success("Filtro de marca aplicado", {
+                description: brand ? `Marca: ${brand}` : "Todas las marcas",
+              });
             }}
             setFilterTipoProducto={(tipo) => {
               setFilterTipoProducto(tipo);
@@ -110,44 +131,87 @@ export default function Page() {
                 tipoProducto: tipo,
                 page: 1,
               });
+              toast.success("Filtro de tipo aplicado", {
+                description: tipo ? `Tipo: ${tipo}` : "Todos los tipos",
+              });
             }}
           />
-        </div>
-
-        {/* Productos */}
-        <div className="flex-1">
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {loading && <SkeletonSchema grid={3} />}
-
-            {products.map((product: ProductType) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-
-            {products.length === 0 && !loading && (
-              <div className="col-span-full text-center text-gray-500 py-10">
-                No se encontraron productos con este filtro.
+        </aside>
+        {/* Productos */}{" "}
+        <section className="flex-1 space-y-6">
+          {" "}
+          {/* Filtros activos */}{" "}
+          {filtrosActivos && (
+            <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-sm text-sm text-gray-700 dark:text-gray-300 flex flex-wrap items-center justify-between">
+              {" "}
+              <div className="space-y-1">
+                {" "}
+                {filterBrand && (
+                  <p>
+                    {" "}
+                    Marca: <strong>{filterBrand}</strong>{" "}
+                  </p>
+                )}{" "}
+                {filterTipoProducto && (
+                  <p>
+                    {" "}
+                    Tipo: <strong>{filterTipoProducto}</strong>{" "}
+                  </p>
+                )}{" "}
+              </div>{" "}
+              <button
+                onClick={handleClearFilters}
+                className="px-3 py-1 bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-700 text-white rounded hover:bg-amber-600"
+              >
+                {" "}
+                Quitar filtros{" "}
+              </button>{" "}
+            </div>
+          )}{" "}
+          {/* Grid */}{" "}
+          <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+            {" "}
+            {loading && <SkeletonSchema grid={4} />}{" "}
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="transition-shadow duration-200 hover:shadow-xl hover:border-amber-500 rounded-lg"
+              >
+                {" "}
+                <ProductCard product={product} showPrice={cleanSlug !== "reventa"} />
               </div>
+            ))}
+            {!loading && products.length === 0 && (
+              <p className="text-amber-600 dark:text-sky-600 text-center mt-6 col-span-full">
+                No se encontraron productos
+              </p>
             )}
           </div>
-
-          {/* Paginador */}
+          {/* Paginado */}
           {meta && meta.pageCount > 1 && (
-            <Pagination
-              page={page}
-              pageCount={meta.pageCount}
-              onPageChange={(newPage) => {
-                setPage(newPage);
-                updateUrl({
-                  brand: filterBrand,
-                  tipoProducto: filterTipoProducto,
-                  page: newPage,
-                });
-              }}
-            />
+            <>
+              
+              <Pagination
+                page={page}
+                pageCount={meta.pageCount}
+                onPageChange={(newPage) => {
+                  setPage(newPage);
+                  updateUrl({
+                    brand: filterBrand,
+                    tipoProducto: filterTipoProducto,
+                    page: newPage,
+                  });
+                }}
+              />
+              <p className="text-sm text-gray-500 w-full text-center mt-2">
+                
+                Página {meta.page} de {meta.pageCount} (Total: {meta.total}
+                )
+              </p>
+            </>
           )}
-        </div>
-      </div>
-    </div>
+        </section>
+      </div>{" "}
+    </main>
   );
 }
-
