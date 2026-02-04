@@ -36,6 +36,8 @@ export default function Page() {
   const [filterTipoProducto, setFilterTipoProducto] = useState(initialTipo);
   const [page, setPage] = useState(initialPage);
 
+  const [isFromUrl, setIsFromUrl] = useState(true);
+
   const updateUrl = (params: {
     brand?: string;
     tipoProducto?: string;
@@ -52,19 +54,34 @@ export default function Page() {
     if (params.page && params.page > 1) query.set("page", String(params.page));
 
     const qs = query.toString();
-    router.push(qs ? `?${qs}` : "?");
+    router.replace(qs ? `?${qs}` : "?");
   };
 
   // Resetear página cuando cambian filtros
   useEffect(() => {
-    if (page !== 1) {
-      setPage(1);
-      updateUrl({
-        brand: filterBrand,
-        tipoProducto: filterTipoProducto,
-        page: 1,
-      });
+    const newBrand = searchParams.get("brand") ?? "";
+    const newTipo = searchParams.get("tipoProducto") ?? "";
+    const newPage = parseInt(searchParams.get("page") ?? "1", 10);
+
+    setIsFromUrl(true);
+
+    if (newBrand !== filterBrand) setFilterBrand(newBrand);
+    if (newTipo !== filterTipoProducto) setFilterTipoProducto(newTipo);
+    if (newPage !== page) setPage(newPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isFromUrl) {
+      setIsFromUrl(false);
+      return;
     }
+    updateUrl({
+      brand: filterBrand,
+      tipoProducto: filterTipoProducto,
+      page: 1,
+    });
+    setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterBrand, filterTipoProducto]);
 
@@ -178,7 +195,10 @@ export default function Page() {
                 className="transition-shadow duration-200 hover:shadow-xl hover:border-amber-500 rounded-lg"
               >
                 {" "}
-                <ProductCard product={product} showPrice={cleanSlug !== "reventa"} />
+                <ProductCard
+                  product={product}
+                  showPrice={cleanSlug !== "reventa"}
+                />
               </div>
             ))}
             {!loading && products.length === 0 && (
@@ -190,7 +210,6 @@ export default function Page() {
           {/* Paginado */}
           {meta && meta.pageCount > 1 && (
             <>
-              
               <Pagination
                 page={page}
                 pageCount={meta.pageCount}
@@ -204,9 +223,7 @@ export default function Page() {
                 }}
               />
               <p className="text-sm text-gray-500 w-full text-center mt-2">
-                
-                Página {meta.page} de {meta.pageCount} (Total: {meta.total}
-                )
+                Página {meta.page} de {meta.pageCount} (Total: {meta.total})
               </p>
             </>
           )}

@@ -16,26 +16,71 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
 
   const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
   const [page, setPage] = useState(initialPage);
-  
-  const { result: products, loading, error , meta } = useGetReventaProducts(
+
+  const [isFromUrl, setIsFromUrl] = useState(true);
+
+  const updateUrl = (params: {
+    brand?: string;
+    tipoProducto?: string;
+    page?: number;
+  }) => {
+    const query = new URLSearchParams();
+
+    if (params.brand && params.brand.trim() !== "")
+      query.set("brand", params.brand);
+
+    if (params.tipoProducto && params.tipoProducto.trim() !== "")
+      query.set("tipoProducto", params.tipoProducto);
+
+    if (params.page && params.page > 1) query.set("page", String(params.page));
+
+    const qs = query.toString();
+    router.replace(qs ? `?${qs}` : "?");
+  };
+
+  useEffect(() => {
+    const newBrand = searchParams.get("brand") ?? "";
+    const newTipo = searchParams.get("tipoProducto") ?? "";
+    const newPage = parseInt(searchParams.get("page") ?? "1", 10);
+
+    setIsFromUrl(true);
+
+    if (newBrand !== filterBrand) {
+    }
+    if (newTipo !== filterTipoProducto) {
+    }
+
+    if (newPage !== page) setPage(newPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isFromUrl) {
+      setIsFromUrl(false);
+      return;
+    }
+    setPage(1);
+    updateUrl({
+      brand: filterBrand,
+      tipoProducto: filterTipoProducto,
+      page: 1,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterBrand, filterTipoProducto]);
+
+  const {
+    result: products,
+    loading,
+    error,
+    meta,
+  } = useGetReventaProducts(
     {
       marca: filterBrand,
       tipoProducto: filterTipoProducto,
     },
     page,
-    12
+    12,
   );
-
-  const updateUrl = (newPage: number) => {
-    const query = new URLSearchParams();
-    if (newPage > 1) query.set("page", String(newPage));
-    router.push(`?${query.toString()}`);
-  };
-
-  useEffect(() => {
-    updateUrl(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
 
   return (
     <section>
@@ -45,7 +90,12 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
       {products && products.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
           {products?.map((product) => (
-            <ProductCard key={product.id} product={product} showPrice ={false} isReventaView/>
+            <ProductCard
+              key={product.id}
+              product={product}
+              showPrice={false}
+              isReventaView
+            />
           ))}
         </div>
       ) : (
@@ -65,7 +115,14 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
           <Pagination
             page={page}
             pageCount={meta.pageCount}
-            onPageChange={(newPage) => setPage(newPage)}
+            onPageChange={(newPage) => {
+              setPage(newPage);
+              updateUrl({
+                brand: filterBrand,
+                tipoProducto: filterTipoProducto,
+                page: newPage,
+              });
+            }}
           />
           <p className="text-sm text-gray-500 text-center mt-2">
             Página {meta.page} de {meta.pageCount} (Total: {meta.total})
