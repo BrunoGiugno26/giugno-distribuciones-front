@@ -9,6 +9,7 @@ import SkeletonProductsGrid from "./components/SkeletonProductsGrid";
 import PriceFilter from "./components/PriceFilter";
 import { toast } from "sonner";
 import Pagination from "@/components/pagination/Pagination";
+import { PARTICULAR_VIEW, REVENTA_VIEW } from "@/config/productViewContexts";
 
 const tipoMap: Record<string, string> = {
   shampoo: "Shampoo",
@@ -28,6 +29,9 @@ export default function ProductTypePage() {
   const { tipoProducto } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const isReventaView = searchParams.get("reventa") === "true";
+  const viewContext = isReventaView ? REVENTA_VIEW : PARTICULAR_VIEW;
 
   const cleanTypeProduct = Array.isArray(tipoProducto)
     ? tipoProducto[0]
@@ -225,7 +229,9 @@ export default function ProductTypePage() {
                   key={product.id}
                   className="transition-shadow duration-200 hover:shadow-xl hover:border-amber-500 rounded-lg"
                 >
-                  <ProductCard product={product} />
+                  <ProductCard product={product}
+                  viewContext={viewContext}
+                  />
                 </div>
               ))}
             </div>

@@ -7,11 +7,20 @@ import SkeletonProduct from "./components/skeleton-product";
 import CarouselProduct from "./components/carousel-product";
 import ProductInfo from "./components/product-info";
 
+import {
+  PARTICULAR_VIEW,
+  REVENTA_VIEW,
+} from "@/config/productViewContexts";
+
 export default function Page() {
   const { productSlug } = useParams();
   const searchParams = useSearchParams();
 
+  //Compatibilidad con tu flujo actual
   const isReventaView = searchParams.get("reventa") === "true";
+
+  // 👉 Elegimos el contexto según la vista
+  const viewContext = isReventaView ? REVENTA_VIEW : PARTICULAR_VIEW;
 
   const { result, loading, error } = useGetProductBySlug(productSlug ?? "");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -32,8 +41,9 @@ export default function Page() {
             setActiveIndex={setActiveIndex}
           />
         </div>
+
         <ProductInfo product={activeProduct}
-        isReventaView={isReventaView}
+        viewContext ={viewContext}
         />
       </div>
 

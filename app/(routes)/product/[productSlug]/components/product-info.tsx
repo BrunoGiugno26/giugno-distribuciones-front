@@ -8,31 +8,31 @@ import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Listbox } from "@headlessui/react";
 import ShareButtons from "@/components/shareButtons";
+import { ProductViewContext } from "@/config/productViewContexts";
 
 interface ProductInfoProps {
   product: ProductType;
-  isReventaView?: boolean;
+  viewContext: ProductViewContext;
 }
 
-const ProductInfo = ({ product, isReventaView = false }: ProductInfoProps) => {
+const ProductInfo = ({ product, viewContext }: ProductInfoProps) => {
   const { attributes } = product;
   const items = useCartStore((s) => s.items);
   const { user, isSignedIn } = useUser();
 
   const variants = attributes.variants?.data ?? [];
   const [selectedVariant, setSelectedVariant] = useState<VariantType | null>(
-    variants.length > 0 ? variants[0] : null
+    variants.length > 0 ? variants[0] : null,
   );
 
   const [quantity, setQuantity] = useState(1);
 
-  const isReventaProduct = attributes.esReventa === true;
-  const hidePrice = isReventaProduct && isReventaView;
+  const hidePrice = viewContext.hidePrice;
 
   const available =
     variants.length > 0
-      ? selectedVariant?.attributes.stock ?? 0
-      : attributes.stock ?? 0;
+      ? (selectedVariant?.attributes.stock ?? 0)
+      : (attributes.stock ?? 0);
 
   const cartQuantity = useMemo(() => {
     return (
@@ -41,7 +41,7 @@ const ProductInfo = ({ product, isReventaView = false }: ProductInfoProps) => {
           i.product.id === product.id &&
           (variants.length > 0 && selectedVariant
             ? i.variant?.id === selectedVariant.id
-            : !i.variant)
+            : !i.variant),
       )?.quantity ?? 0
     );
   }, [items, product.id, selectedVariant, variants.length]);
@@ -77,7 +77,7 @@ const ProductInfo = ({ product, isReventaView = false }: ProductInfoProps) => {
         product,
         quantity,
         user.id,
-        selectedVariant ?? undefined
+        selectedVariant ?? undefined,
       );
 
     toast.success("Producto añadido al carrito 🛒");
@@ -94,14 +94,14 @@ const ProductInfo = ({ product, isReventaView = false }: ProductInfoProps) => {
           Marca: {attributes.marca}
         </p>
       </div>
-
       {/* Descripción */}
       <div className="space-y-3">
         <p className="text-gray-700 dark:text-gray-300">
           {attributes.description}
         </p>
         <p className="text-sm text-amber-600 dark:text-sky-600">
-          Origen: {attributes.origin} | Tipo de cabello: {attributes.tipoCabello}
+          Origen: {attributes.origin} | Tipo de cabello:{" "}
+          {attributes.tipoCabello}
         </p>
 
         {/* Stock disponible y mensajes dinámicos */}
@@ -157,7 +157,6 @@ const ProductInfo = ({ product, isReventaView = false }: ProductInfoProps) => {
           </>
         )}
       </div>
-
       {/* Selector de variantes */}
       {variants.length > 0 && (
         <div className="w-full sm:max-w-xs">
@@ -212,60 +211,58 @@ const ProductInfo = ({ product, isReventaView = false }: ProductInfoProps) => {
           )}
         </div>
       )}
-
       {/* Precio / favoritos / cantidad / WhatsApp */}
       <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
-        {!hidePrice ? (
+        {!viewContext.hidePrice ? (
           <>
             <span className="text-3xl font-semibold text-amber-600 dark:text-sky-400">
               $
-              {attributes.price +
-                (selectedVariant?.attributes.priceDelta ?? 0)}
+              {attributes.price + (selectedVariant?.attributes.priceDelta ?? 0)}
             </span>
-
-            {variants.length === 0 && <FavoriteButton product={product} />}
-
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={quantity}
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/\D/g, "");
-                  const parsed = Math.min(100, Math.max(1, Number(raw)));
-                  setQuantity(parsed);
-                }}
-                className="w-16 px-2 py-1 border rounded text-center"
-              />
-
-              <button
-                onClick={handleAddToCart}
-                disabled={available <= 0 || variantRequired}
-                className="px-4 py-2 bg-amber-600 dark:bg-sky-600 text-white rounded-lg hover:bg-amber-400 dark:hover:bg-sky-400 disabled:bg-gray-400"
-              >
-                Añadir al carrito
-              </button>
-            </div>
+            {viewContext.allowFavorites && variants.length === 0 && (
+              <FavoriteButton product={product} />
+            )}
+            {!viewContext.hideCart && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={quantity}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/\D/g, "");
+                    const parsed = Math.min(100, Math.max(1, Number(raw)));
+                    setQuantity(parsed);
+                  }}
+                  className="w-16 px-2 py-1 border rounded text-center"
+                />
+                <button
+                  onClick={handleAddToCart}
+                  disabled={available <= 0 || variantRequired}
+                  className="px-4 py-2 bg-amber-600 dark:bg-sky-600 text-white rounded-lg hover:bg-amber-400 dark:hover:bg-sky-400 disabled:bg-gray-400"
+                >
+                  Añadir al carrito
+                </button>
+              </div>
+            )}
           </>
         ) : (
-          <button
-            onClick={() =>
-              window.open(
-                `https://wa.me/549261XXXXXXX?text=Hola, quiero consultar por ${attributes.productName}`,
-                "_blank"
-              )
-            }
-            className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
-          >
-            Consultar por WhatsApp
-          </button>
+          viewContext.showWhatsapp && (
+            <button
+              onClick={() =>
+                window.open(
+                  `https://wa.me/549261XXXXXXX?text=Hola, quiero consultar por ${attributes.productName}`,
+                  "_blank",
+                )
+              }
+              className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
+            >
+              Consultar por WhatsApp
+            </button>
+          )
         )}
       </div>
-      
       <ShareButtons className="mt-4" label="Compartir este producto" />
     </div>
   );
 };
-
 export default ProductInfo;
-

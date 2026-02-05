@@ -8,6 +8,7 @@ import ProductCard from "../components/product-card";
 import { useEffect, useState } from "react";
 import Pagination from "@/components/pagination/Pagination";
 import { toast } from "sonner";
+import { PARTICULAR_VIEW, REVENTA_VIEW } from "@/config/productViewContexts";
 
 // Detecta si la categoría usa el sistema nuevo
 const useNewTipoSystem = (slug: string) => {
@@ -24,6 +25,9 @@ export default function Page() {
   const { categorySlug } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const isReventaView = searchParams.get("reventa") === "true";
+  const viewContext = isReventaView ? REVENTA_VIEW : PARTICULAR_VIEW
 
   const cleanSlug = categorySlug as string;
   const isNewSystem = useNewTipoSystem(cleanSlug);
@@ -197,7 +201,7 @@ export default function Page() {
                 {" "}
                 <ProductCard
                   product={product}
-                  showPrice={cleanSlug !== "reventa"}
+                  viewContext={viewContext}
                 />
               </div>
             ))}

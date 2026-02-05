@@ -14,35 +14,22 @@ import React, { useState, useEffect } from "react";
 import AddToCartButton from "@/components/cart/add-to-cart-icon";
 import FavoriteButton from "@/components/favorites/favorite-button";
 import { useCartStore } from "@/store/cart-store";
+import { ProductViewContext } from "@/config/productViewContexts";
 
 type ProductCardProps = {
   product: ProductType;
   forceHasVariants?: boolean;
-  showPrice?: boolean;
-  isReventaView?: boolean;
+  viewContext: ProductViewContext;
 };
 
 const ProductCard = ({
   product,
   forceHasVariants,
-  showPrice = true,
-  isReventaView = false,
+  viewContext,
 }: ProductCardProps) => {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const [showPopup, setShowPopup] = useState(false);
-
-  type ButtonClickEvent = React.MouseEvent<HTMLButtonElement, MouseEvent>;
-
-  const handleExpandClick = (e: ButtonClickEvent) => {
-    e.preventDefault();
-
-    router.push(
-      isReventaView
-        ? `/product/${product.attributes.slug}?reventa=true`
-        : `/product/${product.attributes.slug}`
-    )
-  };
 
   const hasVariants =
     forceHasVariants ?? (product.attributes.variants?.data?.length ?? 0) > 0;
@@ -64,12 +51,10 @@ const ProductCard = ({
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  const productHref = isReventaView
-    ? {
-        pathname: `/product/${product.attributes.slug}`,
-        query: { reventa: "true" },
-      }
-    : `/product/${product.attributes.slug}`;
+  const productHref = {
+    pathname: `/product/${product.attributes.slug}`,
+    query: viewContext.hidePrice ? { reventa: "true" } : {},
+  };
 
   return (
     <div className="relative">
@@ -107,7 +92,13 @@ const ProductCard = ({
                     <div className="absolute w-full px-6 bottom-5 flex justify-center gap-x-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200">
                       <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                         <IconButton
-                          onClick={handleExpandClick as () => void}
+                          onClick={() => {
+                            router.push(
+                              viewContext.hidePrice
+                                ? `/product/${product.attributes.slug}?reventa=true`
+                                : `/product/${product.attributes.slug}`,
+                            );
+                          }}
                           icon={
                             <Expand
                               size={25}
@@ -117,13 +108,13 @@ const ProductCard = ({
                         />
                       </div>
 
-                      {!hasVariants && showPrice && (
+                      {!hasVariants && viewContext.allowFavorites && (
                         <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                           <FavoriteButton product={product} />
                         </div>
                       )}
 
-                      {!hasVariants && showPrice && (
+                      {!hasVariants && !viewContext.hideCart && (
                         <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
                           <AddToCartButton product={product} />
                         </div>
@@ -143,24 +134,26 @@ const ProductCard = ({
             {product.attributes.productName}
           </p>
 
-          {showPrice ? (
+          {!viewContext.hidePrice ? (
             <p className="font-bold text-lg text-center text-amber-600 dark:text-sky-400">
               {formatPrice(product.attributes.price)}
             </p>
           ) : (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                setShowPopup(true);
-              }}
-              className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
-              aria-label="Consultar por WhatsApp"
-            >
-              Consultar por WhatsApp
-            </button>
+            viewContext.showWhatsapp && (
+              <button
+                onClick={(e:React.MouseEvent<HTMLButtonElement>) => {
+                  e.preventDefault();
+                  setShowPopup(true);
+                }}
+                className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
+                aria-label="Consultar por WhatsApp"
+              >
+                Consultar por WhatsApp
+              </button>
+            )
           )}
 
-          {showPrice &&
+          {!viewContext.hidePrice &&
             (hasVariants ? (
               <p className="text-sm text-center font-semibold text-amber-600 dark:text-sky-600">
                 Variantes disponibles - ver en el detalle
@@ -181,7 +174,7 @@ const ProductCard = ({
       </Link>
 
       {/* Popup WhatsApp */}
-      {!showPrice && showPopup && (
+      {viewContext.showWhatsapp && showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl text-center w-[90%] sm:max-w-sm">
             <h2 className="text-lg font-bold mb-2 text-green-600">

@@ -4,6 +4,7 @@ import ProductCard from "@/app/(routes)/category/components/product-card";
 import { useRouter, useSearchParams } from "next/navigation";
 import Pagination from "@/components/pagination/Pagination";
 import { useGetReventaProducts } from "@/api/useGetReventaProduct";
+import { REVENTA_VIEW } from "@/config/productViewContexts";
 
 type Props = {
   filterBrand: string;
@@ -14,6 +15,7 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const viewContext = REVENTA_VIEW
   const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
   const [page, setPage] = useState(initialPage);
 
@@ -93,8 +95,7 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
             <ProductCard
               key={product.id}
               product={product}
-              showPrice={false}
-              isReventaView
+              viewContext={viewContext}
             />
           ))}
         </div>
