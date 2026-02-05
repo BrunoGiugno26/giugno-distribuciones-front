@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useMemo, useState, useCallback} from "react";
 import Pagination from "@/components/pagination/Pagination";
+import { PARTICULAR_VIEW } from "@/config/productViewContexts";
 
 export default function LovedProductsPage() {
   const favorites = useFavoritesStore((state) => state.favorites);
@@ -112,7 +113,7 @@ useEffect(() => {
               "
             >
               {paginatedFavorites.map((fav) => (
-                <ProductCard key={fav.id} product={fav.product} />
+                <ProductCard key={fav.id} product={fav.product} viewContext={PARTICULAR_VIEW} />
               ))}
             </div>
 
