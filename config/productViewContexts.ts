@@ -19,3 +19,10 @@ export const REVENTA_VIEW: ProductViewContext = {
     showWhatsapp: true,
     allowFavorites: false,
 };
+
+export const PROFESIONAL_VIEW: ProductViewContext = {
+    hidePrice: true,
+    hideCart: true,
+    showWhatsapp: true,
+    allowFavorites: false,
+};

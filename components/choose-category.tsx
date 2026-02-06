@@ -5,7 +5,7 @@ import { CategoryType } from "@/types/category";
 import { ResponseType } from "@/types/response";
 import Link from "next/link";
 
-const HIDDEN_CATEGORY_SLUGS = ["reventa"];
+const HIDDEN_CATEGORY_SLUGS = ["reventa","productos-profesionales"];
 
 const ChooseCategory = () => {
   const { result, loading }: ResponseType = useGetCategories();

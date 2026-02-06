@@ -138,7 +138,7 @@ const components: { title: string; href: string; description: string }[] = [
 const salon: { title: string; href: string; description: string }[] = [
   {
     title: "Productos Profesionales",
-    href: "/salones/productos-profesionales",
+    href: "/peluquerias/productos-profesionales",
     description:
       "Tinturas, Decolorantes, Aguas Oxigenadas y Shampoos y Enjuagues de 5Lt para tu salón.",
   },
@@ -150,13 +150,13 @@ const salon: { title: string; href: string; description: string }[] = [
   },
   {
     title: "Accesorios / Herramientas",
-    href: "/salones/accesorios-pro",
+    href: "/peluquerias/accesorios-pro",
     description:
       "Tijeras, secadores, capas y herramientas especializadas para el trabajo en salón.",
   },
   {
     title: "Muebles",
-    href: "/salones/muebles",
+    href: "/peluquerias/muebles",
     description:
       "Sillones, sillas, exhibidores y todo el mobiliario profesional que tu peluquería necesita para crecer.",
   },
