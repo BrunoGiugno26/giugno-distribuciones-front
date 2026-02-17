@@ -63,14 +63,7 @@ const ProductCard = ({
         className="relative flex flex-col justify-between h-full p-3 transition-all duration-200 rounded-xl border border-transparent hover:border-slate-200 hover:shadow-xl bg-white dark:bg-slate-900 dark:hover:border-slate-700 group/card"
       >
         <div className="absolute top-4 px-2 left-2 right-2 flex flex-wrap gap-2 items-start justify-between">
-          <p className="px-2 py-1 text-[10px] font-bold text-white bg-black rounded-full dark:bg-white dark:text-black w-fit uppercase tracking-wider">
-            {product.attributes.tipoProducto}
-          </p>
-          {product.attributes.origin && (
-            <p className="px-2 py-1 text-[10px] font-bold text-black bg-amber-300 dark:bg-sky-500 rounded-full w-fit uppercase tracking-wider shadow-sm">
-              {product.attributes.origin}
-            </p>
-          )}
+          
           {hasVariants && (
             <p className="px-2 py-1 text-[10px] font-bold text-white bg-blue-600 rounded-full w-fit uppercase tracking-wider shadow-sm">
               Tiene variantes
@@ -181,7 +174,7 @@ const ProductCard = ({
               ¿Querés consultar este producto?
             </h2>
             <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-              Escribinos por WhatsApp y te pasamos la lista profesional.
+              Escribinos por WhatsApp para más información.
             </p>
             <a
               href={`https://wa.me/549261XXXXXXX?text=Hola, quiero consultar por ${product.attributes.productName}`}

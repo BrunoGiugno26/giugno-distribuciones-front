@@ -30,10 +30,10 @@ export default function WhatsAppPopup({ productName, onClose }: WhatsAppPopupPro
       >
         <h2 className="text-lg font-bold mb-2 text-green-600">Contactanos por WhatsApp</h2>
         <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-          Escribinos para recibir atención personalizada y lista profesional.
+          Escribinos para recibir atención personalizada.
         </p>
         <Link
-          href={`https://wa.me/549261XXXXXXX?text=Hola, quiero consultar${productName ? " por " + productName : ""}`}
+          href={`https://wa.me/5492612445460?text=Hola, quiero consultar${productName ? " por " + productName : ""}`}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Ir a WhatsApp para consultar"

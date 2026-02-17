@@ -56,7 +56,7 @@ export default function ReventaPage() {
         <section className="flex-1 min-h-[600px]">
           <div className="space-y-6">
             {(filterBrand || filterTipoProducto) && (
-              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-sm text-sm text-gray-700 dark:text-gray-300 flex items-center justify-between">
+              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-sm text-sm text-gray-700 dark:text-gray-300 flex items-center justify-between mb-4">
                 <div className="space-y-1">
                   {filterBrand && (
                     <p>

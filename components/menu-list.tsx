@@ -150,7 +150,7 @@ const salon: { title: string; href: string; description: string }[] = [
   },
   {
     title: "Accesorios / Herramientas",
-    href: "/peluquerias/accesorios-pro",
+    href: "/peluquerias/accesorios-herramientas-pro",
     description:
       "Tijeras, secadores, capas y herramientas especializadas para el trabajo en salón.",
   },

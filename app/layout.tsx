@@ -10,7 +10,7 @@ import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import SyncWrapper from "@/components/sync-wrapper";
-import FloatingWhatsAppButton from "./(routes)/peluquerias/reventa/components/FloatingWhatsAppButton";
+import FloatingWhatsAppButton from "@/components/floating-whatsapp/FloatingWhatsAppButton";
 
 const ubuntu = Ubuntu({
   variable: "--font-geist-sans",

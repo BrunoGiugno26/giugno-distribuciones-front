@@ -1,18 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
 
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { PROFESIONAL_VIEW } from "@/config/productViewContexts";
-import { useGetProfesionalProducts } from "@/api/useGetProfesionalProducts";
 import ProductCard from "@/app/(routes)/category/components/product-card";
 import Pagination from "@/components/pagination/Pagination";
+import { useGetAccesoriosProProducts } from "@/api/useGetAccesoriosProProducts";
+import { PROFESIONAL_VIEW } from "@/config/productViewContexts";
 
 type Props = {
   filterBrand: string;
   filterTipoProducto: string;
 };
 
-const ProductsGridProfesionales = ({
+const ProductsGridAccesoriosPro = ({
   filterBrand,
   filterTipoProducto,
 }: Props) => {
@@ -23,68 +23,65 @@ const ProductsGridProfesionales = ({
 
   const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
   const [page, setPage] = useState(initialPage);
-
   const [isFromUrl, setIsFromUrl] = useState(true);
 
-  const updateUrl = (params: {
-    brand?: string;
-    tipoProducto?: string;
-    page?: number;
-  }) => {
-    const query = new URLSearchParams();
+  const updateUrl = useCallback(
+    (params: { brand?: string; tipoProducto?: string; page?: number }) => {
+      const query = new URLSearchParams();
 
-    if (params.brand && params.brand.trim() !== "")
-      query.set("brand", params.brand);
+      if (params.brand && params.brand.trim() !== "")
+        query.set("brand", params.brand);
 
-    if (params.tipoProducto && params.tipoProducto.trim() !== "")
-      query.set("tipoProducto", params.tipoProducto);
+      if (params.tipoProducto && params.tipoProducto.trim() !== "")
+        query.set("tipoProducto", params.tipoProducto);
 
-    if (params.page && params.page > 1) query.set("page", String(params.page));
+      if (params.page && params.page > 1)
+        query.set("page", String(params.page));
 
-    const qs = query.toString();
-    router.replace(qs ? `?${qs}` : "?", {scroll:false});
-  };
+      const qs = query.toString();
+      router.replace(qs ? `?${qs}` : "?", { scroll: false });
+    },
+    [router]
+  );
 
   useEffect(() => {
     const newPage = parseInt(searchParams.get("page") ?? "1", 10);
-
     setIsFromUrl(true);
-
     if (newPage !== page) setPage(newPage);
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, page]);
 
   useEffect(() => {
     if (isFromUrl) {
       setIsFromUrl(false);
       return;
     }
+
     setPage(1);
     updateUrl({
       brand: filterBrand,
       tipoProducto: filterTipoProducto,
       page: 1,
     });
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterBrand, filterTipoProducto]);
+  }, [filterBrand, filterTipoProducto, isFromUrl, updateUrl]);
 
   const {
     result: products,
     loading,
     error,
     meta,
-  } = useGetProfesionalProducts(
+  } = useGetAccesoriosProProducts(
     {
       marca: filterBrand,
       tipoProducto: filterTipoProducto,
     },
     page,
-    12,
+    12
   );
 
   const handleClearFilters = () => {
-    router.replace("?", {scroll: false})
-  }
+    router.replace("?", { scroll: false });
+  };
 
   return (
     <section>
@@ -106,14 +103,17 @@ const ProductsGridProfesionales = ({
             )}
           </div>
 
-          <button onClick={handleClearFilters} className="px-3 py-1 bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-700 text-white rounded hover:bg-amber-600" >
+          <button
+            onClick={handleClearFilters}
+            className="px-3 py-1 bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-700 text-white rounded hover:bg-amber-600"
+          >
             Quitar filtros
           </button>
         </div>
       )}
 
       {products && products.length > 0 ? (
-        <div className="grid grid-col-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
           {products.map((product) => (
             <ProductCard
               key={product.id}
@@ -125,8 +125,7 @@ const ProductsGridProfesionales = ({
       ) : (
         <div className="text-center p-12 text-gray-500 dark:text-gray-400">
           <p className="text-lg front-semibold">
-            No se han encontrado productos profesionales con los filtros
-            seleccionados
+            No se han encontrado productos con los filtros seleccionados
           </p>
           <p className="text-sm mt-2">
             Probá cambiar la marca o el tipo de producto.
@@ -156,4 +155,4 @@ const ProductsGridProfesionales = ({
   );
 };
 
-export default ProductsGridProfesionales;
+export default ProductsGridAccesoriosPro;
