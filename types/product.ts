@@ -17,6 +17,8 @@ export type ProductType = {
         active: boolean;
         isFeatured: boolean;
         esReventa?: boolean;
+        esProfesional?:boolean;
+        esAccesoriosPro?:boolean;
         tipoProducto: string;
         tipoProductoNuevo?: {
             data: {

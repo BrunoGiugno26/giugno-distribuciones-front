@@ -15,7 +15,7 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const viewContext = REVENTA_VIEW
+  const viewContext = REVENTA_VIEW;
   const initialPage = parseInt(searchParams.get("page") ?? "1", 10);
   const [page, setPage] = useState(initialPage);
 
@@ -37,7 +37,7 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
     if (params.page && params.page > 1) query.set("page", String(params.page));
 
     const qs = query.toString();
-    router.replace(qs ? `?${qs}` : "?", {scroll: false});
+    router.replace(qs ? `?${qs}` : "?", { scroll: false });
   };
 
   useEffect(() => {
@@ -84,14 +84,20 @@ const ProductsGridReventa = ({ filterBrand, filterTipoProducto }: Props) => {
     12,
   );
 
+  // 🔥 FILTRO POR PRODUCTO DESDE EL BUSCADOR
+  const productSlug = searchParams.get("product");
+  const filteredProducts = productSlug
+    ? products?.filter((p) => p.attributes.slug === productSlug)
+    : products;
+
   return (
     <section>
       {loading && <p>Cargando productos...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
 
-      {products && products.length > 0 ? (
+      {filteredProducts && filteredProducts.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products?.map((product) => (
+          {filteredProducts?.map((product) => (
             <ProductCard
               key={product.id}
               product={product}

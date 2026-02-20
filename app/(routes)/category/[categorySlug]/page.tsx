@@ -27,7 +27,7 @@ export default function Page() {
   const searchParams = useSearchParams();
 
   const isReventaView = searchParams.get("reventa") === "true";
-  const viewContext = isReventaView ? REVENTA_VIEW : PARTICULAR_VIEW
+  const viewContext = isReventaView ? REVENTA_VIEW : PARTICULAR_VIEW;
 
   const cleanSlug = categorySlug as string;
   const isNewSystem = useNewTipoSystem(cleanSlug);
@@ -77,6 +77,7 @@ export default function Page() {
 
   useEffect(() => {
     if (isFromUrl) {
+       // eslint-disable-next-line react-hooks/exhaustive-deps
       setIsFromUrl(false);
       return;
     }
@@ -86,17 +87,26 @@ export default function Page() {
       page: 1,
     });
     setPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterBrand, filterTipoProducto]);
 
   const { result, loading, meta } = useGetCategoryProduct(
     cleanSlug,
     { marca: filterBrand, tipoProducto: filterTipoProducto },
     page,
-    12,
+    12
   );
 
-  const products = Array.isArray(result) ? result : [];
+  // -------------------------------
+  // 🔥 FILTRO POR PRODUCTO DESDE EL BUSCADOR
+  // -------------------------------
+  const productSlug = searchParams.get("product");
+
+  const productsRaw = Array.isArray(result) ? result : [];
+
+  const products = productSlug
+    ? productsRaw.filter((p) => p.attributes.slug === productSlug)
+    : productsRaw;
+  // -------------------------------
 
   const filtrosActivos = !!filterBrand || !!filterTipoProducto;
 
@@ -123,7 +133,9 @@ export default function Page() {
           </p>
         </section>
       )}
+
       <Separator />
+
       <div className="flex flex-col lg:flex-row gap-8">
         <aside className="w-full lg:w-64 bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 space-y-6 max-h-[600px] overflow-y-auto">
           <FiltersControlsCategory
@@ -158,60 +170,50 @@ export default function Page() {
             }}
           />
         </aside>
-        {/* Productos */}{" "}
+
         <section className="flex-1 space-y-6">
-          {" "}
-          {/* Filtros activos */}{" "}
           {filtrosActivos && (
             <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-sm text-sm text-gray-700 dark:text-gray-300 flex flex-wrap items-center justify-between">
-              {" "}
               <div className="space-y-1">
-                {" "}
                 {filterBrand && (
                   <p>
-                    {" "}
-                    Marca: <strong>{filterBrand}</strong>{" "}
+                    Marca: <strong>{filterBrand}</strong>
                   </p>
-                )}{" "}
+                )}
                 {filterTipoProducto && (
                   <p>
-                    {" "}
-                    Tipo: <strong>{filterTipoProducto}</strong>{" "}
+                    Tipo: <strong>{filterTipoProducto}</strong>
                   </p>
-                )}{" "}
-              </div>{" "}
+                )}
+              </div>
               <button
                 onClick={handleClearFilters}
                 className="px-3 py-1 bg-amber-500 dark:bg-sky-600 dark:hover:bg-sky-700 text-white rounded hover:bg-amber-600"
               >
-                {" "}
-                Quitar filtros{" "}
-              </button>{" "}
+                Quitar filtros
+              </button>
             </div>
-          )}{" "}
-          {/* Grid */}{" "}
+          )}
+
           <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-            {" "}
-            {loading && <SkeletonSchema grid={4} />}{" "}
+            {loading && <SkeletonSchema grid={4} />}
+
             {products.map((product) => (
               <div
                 key={product.id}
                 className="transition-shadow duration-200 hover:shadow-xl hover:border-amber-500 rounded-lg"
               >
-                {" "}
-                <ProductCard
-                  product={product}
-                  viewContext={viewContext}
-                />
+                <ProductCard product={product} viewContext={viewContext} />
               </div>
             ))}
+
             {!loading && products.length === 0 && (
               <p className="text-amber-600 dark:text-sky-600 text-center mt-6 col-span-full">
                 No se encontraron productos
               </p>
             )}
           </div>
-          {/* Paginado */}
+
           {meta && meta.pageCount > 1 && (
             <>
               <Pagination
@@ -232,7 +234,8 @@ export default function Page() {
             </>
           )}
         </section>
-      </div>{" "}
+      </div>
     </main>
   );
 }
+

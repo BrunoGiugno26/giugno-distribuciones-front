@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import SyncWrapper from "@/components/sync-wrapper";
 import FloatingWhatsAppButton from "@/components/floating-whatsapp/FloatingWhatsAppButton";
+import SearchOverlay from "@/components/search/SearchOverlay";
 
 const ubuntu = Ubuntu({
   variable: "--font-geist-sans",
@@ -86,6 +87,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navbar />
+            <SearchOverlay/>
             <FloatingWhatsAppButton/>
             {children}
             <Footer />

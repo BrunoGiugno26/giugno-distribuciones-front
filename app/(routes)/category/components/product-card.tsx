@@ -1,10 +1,8 @@
+"use client";
 /* eslint-disable @next/next/no-img-element */
-import { Expand } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatPrice } from "@/lib/formatPrice";
 import { ProductType } from "@/types/product";
-import IconButton from "@/components/icon-button";
 import {
   Carousel,
   CarouselContent,
@@ -27,7 +25,6 @@ const ProductCard = ({
   forceHasVariants,
   viewContext,
 }: ProductCardProps) => {
-  const router = useRouter();
   const items = useCartStore((s) => s.items);
   const [showPopup, setShowPopup] = useState(false);
 
@@ -42,7 +39,6 @@ const ProductCard = ({
   const remaining = Math.max(stockGeneral - cartQuantity, 0);
   const isLowStock = remaining > 0 && remaining <= 3;
 
-  // 🔑 Cerrar popup con tecla ESC
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setShowPopup(false);
@@ -63,7 +59,6 @@ const ProductCard = ({
         className="relative flex flex-col justify-between h-full p-3 transition-all duration-200 rounded-xl border border-transparent hover:border-slate-200 hover:shadow-xl bg-white dark:bg-slate-900 dark:hover:border-slate-700 group/card"
       >
         <div className="absolute top-4 px-2 left-2 right-2 flex flex-wrap gap-2 items-start justify-between">
-          
           {hasVariants && (
             <p className="px-2 py-1 text-[10px] font-bold text-white bg-blue-600 rounded-full w-fit uppercase tracking-wider shadow-sm">
               Tiene variantes
@@ -82,33 +77,19 @@ const ProductCard = ({
                       alt={product.attributes.productName}
                       className="object-cover w-full h-full p-0 transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute w-full px-6 bottom-5 flex justify-center gap-x-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200">
-                      <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
-                        <IconButton
-                          onClick={() => {
-                            router.push(
-                              viewContext.hidePrice
-                                ? `/product/${product.attributes.slug}?reventa=true`
-                                : `/product/${product.attributes.slug}`,
-                            );
-                          }}
-                          icon={
-                            <Expand
-                              size={25}
-                              className="cursor-pointer text-gray-600"
-                            />
-                          }
-                        />
-                      </div>
+                    <div
+                      className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-x-1.5 md:gap-x-3 px-0 md:px-6 max-w-[90%] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200"
+                    >
+                    
 
                       {!hasVariants && viewContext.allowFavorites && (
-                        <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                        <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100 shrink-0">
                           <FavoriteButton product={product} />
                         </div>
                       )}
 
                       {!hasVariants && !viewContext.hideCart && (
-                        <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100">
+                        <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100 shrink-0">
                           <AddToCartButton product={product} />
                         </div>
                       )}
@@ -134,7 +115,7 @@ const ProductCard = ({
           ) : (
             viewContext.showWhatsapp && (
               <button
-                onClick={(e:React.MouseEvent<HTMLButtonElement>) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.preventDefault();
                   setShowPopup(true);
                 }}
@@ -155,7 +136,7 @@ const ProductCard = ({
               <>
                 <p className="text-sm font-semibold text-green-600">En stock</p>
                 {isLowStock && (
-                  <p className="text-sm font-semibold text-red-500">
+                  <p className="text-sm text-center font-semibold text-red-500">
                     ¡Quedan solo {remaining} unidades!
                   </p>
                 )}

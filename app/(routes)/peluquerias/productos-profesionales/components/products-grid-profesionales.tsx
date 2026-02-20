@@ -86,6 +86,12 @@ const ProductsGridProfesionales = ({
     router.replace("?", {scroll: false})
   }
 
+  const productSlug = searchParams.get("product");
+
+  const filteredProducts = productSlug
+  ? products?.filter((p) => p.attributes.slug === productSlug)
+  : products;
+
   return (
     <section>
       {loading && <p>Cargando productos...</p>}
@@ -112,9 +118,9 @@ const ProductsGridProfesionales = ({
         </div>
       )}
 
-      {products && products.length > 0 ? (
+      {filteredProducts && filteredProducts.length > 0 ? (
         <div className="grid grid-col-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}

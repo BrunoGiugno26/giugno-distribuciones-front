@@ -41,7 +41,7 @@ const ProductsGridAccesoriosPro = ({
       const qs = query.toString();
       router.replace(qs ? `?${qs}` : "?", { scroll: false });
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {
@@ -76,12 +76,18 @@ const ProductsGridAccesoriosPro = ({
       tipoProducto: filterTipoProducto,
     },
     page,
-    12
+    12,
   );
 
   const handleClearFilters = () => {
     router.replace("?", { scroll: false });
   };
+
+  // 🔥 FILTRO POR PRODUCTO DESDE EL BUSCADOR
+  const productSlug = searchParams.get("product");
+  const filteredProducts = productSlug
+    ? products?.filter((p) => p.attributes.slug === productSlug)
+    : products;
 
   return (
     <section>
@@ -112,9 +118,9 @@ const ProductsGridAccesoriosPro = ({
         </div>
       )}
 
-      {products && products.length > 0 ? (
+      {filteredProducts && filteredProducts.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
