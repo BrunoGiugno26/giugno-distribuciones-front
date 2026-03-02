@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import { ProductType } from "@/types/product";
 import {
   Carousel,
+  CarouselApi,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
@@ -13,6 +14,7 @@ import AddToCartButton from "@/components/cart/add-to-cart-icon";
 import FavoriteButton from "@/components/favorites/favorite-button";
 import { useCartStore } from "@/store/cart-store";
 import { ProductViewContext } from "@/config/productViewContexts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type ProductCardProps = {
   product: ProductType;
@@ -27,6 +29,9 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const items = useCartStore((s) => s.items);
   const [showPopup, setShowPopup] = useState(false);
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | undefined>();
 
   const hasVariants =
     forceHasVariants ?? (product.attributes.variants?.data?.length ?? 0) > 0;
@@ -52,6 +57,8 @@ const ProductCard = ({
     query: viewContext.hidePrice ? { reventa: "true" } : {},
   };
 
+  const images = product.attributes.images?.data ?? [];
+
   return (
     <div className="relative">
       <Link
@@ -65,40 +72,74 @@ const ProductCard = ({
             </p>
           )}
         </div>
+        <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-gray-50 dark:bg-slate-800">
 
-        <Carousel opts={{ align: "start" }} className="w-full mx-auto">
-          <CarouselContent>
-            {Array.isArray(product.attributes.images?.data) &&
-              product.attributes.images.data.map((image) => (
+          {images.length > 1 && (
+            <div className="absolute top-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full z-30">
+              {activeImageIndex +1} / {images.length}
+            </div>
+          )}
+          {images.length > 1 && (
+            <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              carouselApi?.scrollPrev();
+            }}
+            className="hidden sm:flex absolute left-2 top-1/2 -translate-y-1/2 z-30 bg-white/70 dark:bg-black/40 p-2 rounded-full shadow hover:scale-110 transition"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          )}
+
+          {images.length > 1 && (
+            <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              carouselApi?.scrollNext();
+            }}
+            className="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-white/70 dark:bg-black/40 p-2 rounded-full shadow hover:scale-110 transition"
+            >
+              <ChevronRight className="w-5 h-5"/>
+            </button>
+          )}
+
+          <Carousel
+          opts={{loop:true}}
+          setApi={(api) => {
+            setCarouselApi(api);
+            api?.on("select", () => {
+              setActiveImageIndex(api.selectedScrollSnap());
+            });
+          }}
+          >
+            <CarouselContent>
+              {images.map((image) => (
                 <CarouselItem key={image.id} className="group">
-                  <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center">
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${image.attributes.url}`}
-                      alt={product.attributes.productName}
-                      className="object-cover w-full h-full p-0 transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div
-                      className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-x-1.5 md:gap-x-3 px-0 md:px-6 max-w-[90%] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200"
-                    >
-                    
-
-                      {!hasVariants && viewContext.allowFavorites && (
-                        <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100 shrink-0">
-                          <FavoriteButton product={product} />
-                        </div>
-                      )}
-
-                      {!hasVariants && !viewContext.hideCart && (
-                        <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100 shrink-0">
-                          <AddToCartButton product={product} />
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <img
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${image.attributes.url}`}
+                  alt={product.attributes.productName}
+                  className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                  />
                 </CarouselItem>
               ))}
-          </CarouselContent>
-        </Carousel>
+            </CarouselContent>
+          </Carousel>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-x-1.5 md:gap-x-3 px-0 md:px-6 max-w-[90%] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition duration-200 z-30">
+          {!hasVariants && viewContext.allowFavorites && (
+            <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100 shrink-0">
+              <FavoriteButton product={product}/>
+            </div>
+          )}
+
+          {!hasVariants && !viewContext.hideCart && (
+            <div className="bg-white rounded-full shadow-lg hover:scale-110 transition-transform border border-gray-100 shrink-0">
+              <AddToCartButton product={product}/>
+            </div>
+          )}
+          </div>
+        </div>
 
         <div className="flex flex-col items-center mt-4 space-y-1">
           <p

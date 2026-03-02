@@ -47,7 +47,7 @@ const Navbar = () => {
             onClick={() => router.push("/")}
           >
             <h1 className="text-xl sm:text-2xl md:text-3xl whitespace-nowrap cursor-pointer hidden md:block">
-              Giugno <span className="font-bold">Distribuciones</span>
+              Giugno<span className="font-bold">Distribuciones</span>
             </h1>
 
             <Image

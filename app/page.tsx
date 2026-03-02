@@ -8,8 +8,8 @@ export default function Home() {
   return (
       <main>
       <CarouselTextBanner/>
-      <FeaturedProducts/>
       <ProfileSelector/>
+      <FeaturedProducts/>
       <ChooseCategory/>
       <BannerProduct/>
       </main>

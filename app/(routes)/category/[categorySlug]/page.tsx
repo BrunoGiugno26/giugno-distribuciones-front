@@ -10,7 +10,6 @@ import Pagination from "@/components/pagination/Pagination";
 import { toast } from "sonner";
 import { PARTICULAR_VIEW, REVENTA_VIEW } from "@/config/productViewContexts";
 
-// Detecta si la categoría usa el sistema nuevo
 const useNewTipoSystem = (slug: string) => {
   return [
     "accesorios",
@@ -61,7 +60,6 @@ export default function Page() {
     router.replace(qs ? `?${qs}` : "?");
   };
 
-  // Resetear página cuando cambian filtros
   useEffect(() => {
     const newBrand = searchParams.get("brand") ?? "";
     const newTipo = searchParams.get("tipoProducto") ?? "";

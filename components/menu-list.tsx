@@ -164,9 +164,9 @@ const salon: { title: string; href: string; description: string }[] = [
 
 const revendedor = [
   {
-    title: "Perfil",
-    href: "/shop",
-    description: "Accedé a toda la información, Elegí tu Perfil que mas se adapte a vos!!.",
+    title: "Soluciones para Perfumerías",
+    href: "/consultas",
+    description: "Impulsá tu negocio con productos originales, exhibición profesional y beneficios exclusivos para perfumerías.",
   },
   {
     title: "Ofertas por Volumen",
