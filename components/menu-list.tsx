@@ -165,8 +165,8 @@ const salon: { title: string; href: string; description: string }[] = [
 const revendedor = [
   {
     title: "Soluciones para Perfumerías",
-    href: "/consultas",
-    description: "Impulsá tu negocio con productos originales, exhibición profesional y beneficios exclusivos para perfumerías.",
+    href: "/perfumerias",
+    description: "Impulsá tu negocio con productos originales y beneficios exclusivos para perfumerías.",
   },
   {
     title: "Ofertas por Volumen",
@@ -174,18 +174,7 @@ const revendedor = [
     description:
       "Promociones especiales para revendedores habilitados. Consultá condiciones.",
   },
-  {
-    title: "Cómo Comprar",
-    href: "/como-comprar",
-    description:
-      "Conocé el proceso de compra para cada tipo de cliente. Todo explicado paso a paso.",
-  },
-  {
-    title: "Preguntas Frecuentes",
-    href: "/faq",
-    description:
-      "Respuestas a las dudas más comunes sobre productos, envíos y condiciones comerciales.",
-  },
+
 ];
 
 function ListItem({

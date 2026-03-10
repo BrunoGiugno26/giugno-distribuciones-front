@@ -46,7 +46,7 @@ const ProfileSelector = () => {
             </Link>
 
             <Link
-              href="/offers"
+              href="/perfumerias"
               className="bg-card border border-border rounded-xl p-6 hover:shadow-lg hover:scale-[1.02] transition-transform text-left"
             >
               <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
@@ -54,7 +54,7 @@ const ProfileSelector = () => {
                 Perfumerías
               </h3>
               <p className="text-muted-foreground text-sm">
-                Ofertas por volumen y condiciones especiales para negocios.
+                Impulsá tu negocio con productos originales y beneficios exclusivos para perfumerías.
               </p>
             </Link>
           </div>

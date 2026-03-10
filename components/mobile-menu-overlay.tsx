@@ -96,10 +96,8 @@ const MobileMenuOverlay = () => {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col space-y-2 pl-7">
-                    <Link href="/shop" onClick={() => setOpen(false)}>Perfil</Link>
+                    <Link href="/perfumerias" onClick={() => setOpen(false)}>Secciones para Perfumerias</Link>
                     <Link href="/offers" onClick={() => setOpen(false)}>Ofertas por Volumen</Link>
-                    <Link href="/como-comprar" onClick={() => setOpen(false)}>¿Cómo Comprar?</Link>
-                    <Link href="/faq" onClick={() => setOpen(false)}>Preguntas Frecuentes</Link>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -111,7 +109,7 @@ const MobileMenuOverlay = () => {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col space-y-2 pl-7">
-                    <Link href="/category/accesorios-y-herramientas-profesionales" onClick={() => setOpen(false)}>Accesorios Profesionales</Link>
+                    <Link href="/category/accesorios-y-herramientas-profesionales" onClick={() => setOpen(false)}> Ver todos los productos</Link>
                   </AccordionContent>
                 </AccordionItem>
 
